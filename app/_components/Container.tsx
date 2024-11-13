@@ -1,0 +1,13 @@
+interface ContainerProps {
+  children: React.ReactNode;
+}
+
+function Container({ children }: ContainerProps) {
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-slate-100">
+      {children}
+    </div>
+  );
+}
+
+export default Container;

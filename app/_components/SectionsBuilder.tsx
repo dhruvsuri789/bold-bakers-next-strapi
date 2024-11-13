@@ -18,18 +18,22 @@ async function SectionsBuilder() {
       {data.map((section) => {
         switch (section.sectionCategory.sectionCategory) {
           case "featured":
+            const featuredSection = section as HomepageFeaturedQuery;
             return (
-              <HomepageFeatured section={section as HomepageFeaturedQuery} />
+              <HomepageFeatured section={featuredSection} key={section.id} />
             );
           case "aboutSmall":
+            const aboutSmallSection = section as HomepageAboutSmallQuery;
             return (
               <HomepageAboutSmall
-                section={section as HomepageAboutSmallQuery}
+                section={aboutSmallSection}
+                key={section.id}
               />
             );
           case "recipeList":
+            const recipeSection = section as HomepageRecipeQuery;
             return (
-              <HomepageRecipeList section={section as HomepageRecipeQuery} />
+              <HomepageRecipeList section={recipeSection} key={section.id} />
             );
         }
       })}

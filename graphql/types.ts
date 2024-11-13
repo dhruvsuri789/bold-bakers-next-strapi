@@ -38,10 +38,15 @@ export type HomepageFeaturedQuery = {
   };
 };
 
+export type JSONBlockMarkdownType = {
+  type: string;
+  children: [{ type: string; text: string }];
+}[];
+
 export type HomepageAboutSmallQuery = {
   id: string;
   heading: string;
-  description: JSON;
+  description: JSONBlockMarkdownType;
   cta: string;
   image: {
     height: number;
@@ -61,3 +66,5 @@ export type HomepageSectionsQuery = {
     ];
   };
 };
+
+// Homepage: {HomepageAboutSmallQuery | HomepageFeaturedQuery | HomepageRecipeQuery}[];

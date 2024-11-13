@@ -20,20 +20,26 @@ async function SectionsBuilder() {
           case "featured":
             const featuredSection = section as HomepageFeaturedQuery;
             return (
-              <HomepageFeatured section={featuredSection} key={section.id} />
+              <HomepageFeatured
+                section={featuredSection}
+                key={featuredSection.id}
+              />
             );
           case "aboutSmall":
             const aboutSmallSection = section as HomepageAboutSmallQuery;
             return (
               <HomepageAboutSmall
                 section={aboutSmallSection}
-                key={section.id}
+                key={aboutSmallSection.id}
               />
             );
           case "recipeList":
             const recipeSection = section as HomepageRecipeQuery;
             return (
-              <HomepageRecipeList section={recipeSection} key={section.id} />
+              <HomepageRecipeList
+                section={recipeSection}
+                key={recipeSection.id}
+              />
             );
         }
       })}

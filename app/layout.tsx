@@ -26,7 +26,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${lora.variable} ${inter.variable}`}>
-      <body className="antialiased bg-red-100">{children}</body>
+      <body className="antialiased text-neutral-900 bg-red-100">
+        {children}
+      </body>
     </html>
   );
 }

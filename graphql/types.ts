@@ -40,7 +40,7 @@ export type HomepageFeaturedQuery = {
 
 export type JSONBlockMarkdownType = {
   type: string;
-  children: [{ type: string; text: string }];
+  children: { type: string; text: string }[];
 }[];
 
 export type HomepageAboutSmallQuery = {
@@ -68,3 +68,38 @@ export type HomepageSectionsQuery = {
 };
 
 // Homepage: {HomepageAboutSmallQuery | HomepageFeaturedQuery | HomepageRecipeQuery}[];
+
+export type RecipesQuery = {
+  recipes: {
+    documentId: string;
+    name: string;
+    description: string;
+    prepTime: number | null;
+    cookTime: number | null;
+    restTime: number | null;
+    settingTime: number | null;
+    servings: number | null;
+    calories: number | null;
+    image: {
+      url: string;
+    };
+    video: string | null;
+    categories: {
+      name: string;
+    }[];
+    courses: {
+      name: string;
+    }[];
+    ingredients: string;
+    instructions: string;
+    recipeNotes: string | null;
+    videoId: string | null;
+    author: {
+      name: string;
+      documentId: string;
+    };
+    createdAt: Date;
+    updatedAt: Date;
+    publishedAt: Date;
+  }[];
+};

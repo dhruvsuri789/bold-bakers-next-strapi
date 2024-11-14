@@ -1,11 +1,203 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import Container from "@/app/_components/Container";
+import Nav from "@/app/_components/Nav";
+import { getRecipe } from "@/graphql/queries";
+import Link from "next/link";
+import ButtonLink from "@/app/_components/ButtonLink";
+import Image from "next/image";
+import { BASE_URL } from "@/utils/constants";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import HomepageAboutSmall from "@/app/_components/HomepageAboutSmall";
+import AboutSmall from "@/app/_components/AboutSmall";
+import { Suspense } from "react";
+
 interface RecipePageProps {
   params: {
     id: string;
   };
 }
 
-function RecipePage({ params }: RecipePageProps) {
-  return <h1>{params.id}</h1>;
+//TODO Generate static params
+
+async function RecipePage({ params }: RecipePageProps) {
+  const { recipes } = await getRecipe(params.id);
+  const {
+    documentId,
+    name,
+    description,
+    prepTime,
+    cookTime,
+    restTime,
+    settingTime,
+    servings,
+    calories,
+    image,
+    video,
+    categories,
+    courses,
+    ingredients,
+    instructions,
+    recipeNotes,
+    videoId,
+    author,
+    createdAt,
+    updatedAt,
+    publishedAt,
+  } = recipes[0];
+
+  const categoriesLength = categories.length;
+  const coursesLength = courses.length;
+  const totalTime =
+    (prepTime ?? 0) + (cookTime ?? 0) + (restTime ?? 0) + (settingTime ?? 0);
+
+  const stats = [
+    { label: "Prep time", value: prepTime, unit: "time" },
+    { label: "Cook time", value: cookTime, unit: "time" },
+    { label: "Rest time", value: restTime, unit: "time" },
+    { label: "Setting time", value: settingTime, unit: "time" },
+    { label: "Total time", value: totalTime, unit: "time" },
+    { label: "Servings", value: servings, unit: "servings" },
+    { label: "Calories", value: calories, unit: "calories" },
+  ];
+
+  return (
+    <Container>
+      <Nav />
+      <main>
+        <div className="flex flex-col gap-4 py-8">
+          <div className="text-red-600 text-sm font-bold flex gap-4">
+            {categories.map((category, index) => (
+              <span className="flex gap-4" key={`${category.name}-${index}`}>
+                <Link
+                  href={`/recipes?category=${category.name}`}
+                  className="hover:text-red-500 transition-colors"
+                >
+                  {category.name}
+                </Link>
+                {index < categoriesLength - 1 && <span>•</span>}
+              </span>
+            ))}
+          </div>
+          <div className="grid grid-cols-[2fr,auto]">
+            <div className="max-w-[600px] flex flex-col gap-4">
+              <h1 className="text-4xl font-bold">{name}</h1>
+              <p>{description}</p>
+              <span className="text-sm text-neutral-600">
+                By{" "}
+                {
+                  <Link
+                    className="font-semibold text-red-600 hover:text-red-500 transition-colors"
+                    href={`/recipes?author=${author.name}`}
+                  >
+                    {author.name}
+                  </Link>
+                }{" "}
+                |{"  Published on "}
+                {new Date(publishedAt).toLocaleString("en-US", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}{" "}
+                |{" Updated on "}
+                {new Date(updatedAt).toLocaleString("en-US", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-4 self-end">
+              <ButtonLink varient="secondary" href="#">
+                Jump to recipe
+              </ButtonLink>
+              <ButtonLink varient="primary" href="#">
+                Jump to video
+              </ButtonLink>
+            </div>
+          </div>
+          <div className="aspect-video relative rounded-3xl overflow-hidden mt-4">
+            <Image
+              fill
+              className="object-cover"
+              src={`${BASE_URL}${image.url}`}
+              alt={name}
+            />
+          </div>
+          <div className="grid grid-cols-[2.5fr,1fr] gap-8 mt-4">
+            <div className="flex flex-col gap-12">
+              <div className="flex flex-col gap-4">
+                <h2 className="text-3xl font-bold" id="stats">
+                  Stats
+                </h2>
+                <div className="flex gap-4 divide-x-2">
+                  {stats.map((stat, index) => {
+                    if (!stat.value) return null; // Skip if value is not present
+
+                    const paddingClass = index === 0 ? "pr-4" : "pl-7 pr-4";
+
+                    return (
+                      <div key={stat.label} className={paddingClass}>
+                        {StatsInfo(stat.label, stat.value, stat.unit)}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              {videoId && (
+                <div className="flex flex-col gap-4 ">
+                  <h2 className="text-3xl font-bold" id="video">
+                    Video
+                  </h2>
+                  <iframe
+                    src={`https://www.youtube.com/embed/${videoId}`} // Ensure videoId is the correct YouTube video ID
+                    title={name}
+                    className="aspect-video rounded-3xl"
+                    allowFullScreen
+                  />
+                </div>
+              )}
+              <div className="flex flex-col gap-4">
+                <h2 className="text-3xl font-bold" id="ingredients">
+                  Ingredients
+                </h2>
+                <Markdown remarkPlugins={[remarkGfm]}>{ingredients}</Markdown>
+              </div>
+              <div className="flex flex-col gap-4">
+                <h2 className="text-3xl font-bold" id="instructions">
+                  Instructions
+                </h2>
+                <Markdown remarkPlugins={[remarkGfm]}>{instructions}</Markdown>
+              </div>
+              {recipeNotes && (
+                <div className="flex flex-col gap-4">
+                  <h2 className="text-3xl font-bold" id="recipeNotes">
+                    Recipe Notes
+                  </h2>
+                  <Markdown remarkPlugins={[remarkGfm]}>{recipeNotes}</Markdown>
+                </div>
+              )}
+              <Suspense fallback="...Loading">
+                <AboutSmall categories={categories} />
+              </Suspense>
+            </div>
+          </div>
+        </div>
+      </main>
+    </Container>
+  );
+}
+
+function StatsInfo(heading: string, value: number, type: string) {
+  return (
+    <div className="flex flex-col gap-1 items-start">
+      <span className="text-sm text-neutral-600">{heading}</span>
+      <span className="font-bold">
+        {value} {type === "time" && "mins"}
+        {type === "calories" && "kcal"}
+      </span>
+    </div>
+  );
 }
 
 export default RecipePage;

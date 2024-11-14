@@ -15,14 +15,14 @@ async function SectionsBuilder() {
 
   return (
     <>
-      {data.map((section) => {
+      {data.map((section, index) => {
         switch (section.sectionCategory.sectionCategory) {
           case "featured":
             const featuredSection = section as HomepageFeaturedQuery;
             return (
               <HomepageFeatured
                 section={featuredSection}
-                key={featuredSection.id}
+                key={featuredSection.id || `featured-${index}`}
               />
             );
           case "aboutSmall":
@@ -30,7 +30,7 @@ async function SectionsBuilder() {
             return (
               <HomepageAboutSmall
                 section={aboutSmallSection}
-                key={aboutSmallSection.id}
+                key={aboutSmallSection.id || `aboutSmall-${index}`}
               />
             );
           case "recipeList":
@@ -38,7 +38,7 @@ async function SectionsBuilder() {
             return (
               <HomepageRecipeList
                 section={recipeSection}
-                key={recipeSection.id}
+                key={recipeSection.id || `recipeList-${index}`}
               />
             );
         }

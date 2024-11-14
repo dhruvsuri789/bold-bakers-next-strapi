@@ -21,6 +21,7 @@ function HomepageFeatured({ section }: HomepageFeaturedProps) {
               key={image.name}
               width={80}
               height={20}
+              // className="grayscale"
             />
           );
         })}

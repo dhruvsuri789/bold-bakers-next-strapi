@@ -1,9 +1,3 @@
-export type AuthorsQuery = {
-  authors: {
-    name: string;
-  }[];
-};
-
 export type HomepageRecipeQuery = {
   id: string;
   ctaNullable: string | null;
@@ -103,3 +97,38 @@ export type RecipesQuery = {
     publishedAt: Date;
   }[];
 };
+
+export type RelatedRecipesQuery = {
+  recipes: {
+    documentId: string;
+    name: string;
+    image: {
+      url: string;
+    };
+  }[];
+};
+
+export type CategoriesQuery = {
+  categories: {
+    name: string;
+    documentId: string;
+  }[];
+};
+
+export type CoursesQuery = {
+  courses: {
+    name: string;
+    documentId: string;
+  }[];
+};
+
+export type AuthorsQuery = {
+  authors: {
+    name: string;
+    documentId: string;
+  }[];
+};
+
+export type CategoryCoursesAuthorsQuery = CoursesQuery &
+  AuthorsQuery &
+  CategoriesQuery;

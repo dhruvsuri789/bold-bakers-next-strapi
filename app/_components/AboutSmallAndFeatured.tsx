@@ -2,13 +2,11 @@ import { getHomepageSections } from "@/graphql/queries";
 import {
   HomepageAboutSmallQuery,
   HomepageFeaturedQuery,
-  HomepageRecipeQuery,
 } from "@/graphql/types";
-import HomepageRecipeList from "./HomepageRecipeList";
 import HomepageAboutSmall from "./HomepageAboutSmall";
 import HomepageFeatured from "./HomepageFeatured";
 
-async function SectionsBuilder() {
+async function AboutSmallAndFeatured() {
   const {
     homepage: { Homepage: data },
   } = await getHomepageSections();
@@ -17,14 +15,6 @@ async function SectionsBuilder() {
     <>
       {data.map((section, index) => {
         switch (section.sectionCategory.sectionCategory) {
-          case "featured":
-            const featuredSection = section as HomepageFeaturedQuery;
-            return (
-              <HomepageFeatured
-                section={featuredSection}
-                key={featuredSection.id || `featured-${index}`}
-              />
-            );
           case "aboutSmall":
             const aboutSmallSection = section as HomepageAboutSmallQuery;
             return (
@@ -33,12 +23,12 @@ async function SectionsBuilder() {
                 key={aboutSmallSection.id || `aboutSmall-${index}`}
               />
             );
-          case "recipeList":
-            const recipeSection = section as HomepageRecipeQuery;
+          case "featured":
+            const featuredSection = section as HomepageFeaturedQuery;
             return (
-              <HomepageRecipeList
-                section={recipeSection}
-                key={recipeSection.id || `recipeList-${index}`}
+              <HomepageFeatured
+                section={featuredSection}
+                key={featuredSection.id || `featured-${index}`}
               />
             );
           default:
@@ -49,4 +39,4 @@ async function SectionsBuilder() {
   );
 }
 
-export default SectionsBuilder;
+export default AboutSmallAndFeatured;

@@ -19,7 +19,7 @@ function HomepageAboutSmall({ section }: HomepageAboutSmallProps) {
   } = section;
 
   return (
-    <div className="flex flex-col py-24 gap-4 items-center">
+    <div className="flex flex-col py-16 gap-4 items-center">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="flex flex-col gap-4 items-start">
           <h2 className="text-3xl font-bold self-start">{heading}</h2>

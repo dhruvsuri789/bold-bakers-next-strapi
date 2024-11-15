@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import AboutSmallAndFeatured from "@/app/_components/AboutSmallAndFeatured";
+import ButtonLink from "@/app/_components/ButtonLink";
 import Container from "@/app/_components/Container";
 import Nav from "@/app/_components/Nav";
+import RelatedRecipes from "@/app/_components/RelatedRecipes";
 import { getRecipe } from "@/graphql/queries";
-import Link from "next/link";
-import ButtonLink from "@/app/_components/ButtonLink";
-import Image from "next/image";
 import { BASE_URL } from "@/utils/constants";
+import Image from "next/image";
+import Link from "next/link";
+import { Suspense } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import HomepageAboutSmall from "@/app/_components/HomepageAboutSmall";
-import AboutSmall from "@/app/_components/AboutSmall";
-import { Suspense } from "react";
 
 interface RecipePageProps {
   params: {
@@ -108,10 +108,10 @@ async function RecipePage({ params }: RecipePageProps) {
               </span>
             </div>
             <div className="grid grid-cols-2 gap-4 self-end">
-              <ButtonLink varient="secondary" href="#">
+              <ButtonLink varient="secondary" href="#ingredients">
                 Jump to recipe
               </ButtonLink>
-              <ButtonLink varient="primary" href="#">
+              <ButtonLink varient="primary" href="#video">
                 Jump to video
               </ButtonLink>
             </div>
@@ -177,11 +177,14 @@ async function RecipePage({ params }: RecipePageProps) {
                   <Markdown remarkPlugins={[remarkGfm]}>{recipeNotes}</Markdown>
                 </div>
               )}
-              <Suspense fallback="...Loading">
-                <AboutSmall categories={categories} />
-              </Suspense>
             </div>
           </div>
+          <Suspense fallback="...Loading">
+            <RelatedRecipes categories={categories} recipeID={documentId} />
+          </Suspense>
+          <Suspense fallback="...Loading">
+            <AboutSmallAndFeatured />
+          </Suspense>
         </div>
       </main>
     </Container>

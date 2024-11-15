@@ -7,7 +7,7 @@ function Nav() {
       <Link href="/">
         <Image src="/logo.png" alt="logo" width={150} height={100} />
       </Link>
-      <ul className="flex gap-12">
+      <ul className="flex gap-12 list-none">
         <li>
           <Link
             href="/recipes"

@@ -1,6 +1,12 @@
 import "server-only";
 import { strapiGQLQuery } from "./fetch";
-import { AuthorsQuery, HomepageSectionsQuery, RecipesQuery } from "./types";
+import {
+  AuthorsQuery,
+  CategoryCoursesAuthorsQuery,
+  HomepageSectionsQuery,
+  RecipesQuery,
+  RelatedRecipesQuery,
+} from "./types";
 
 export async function getAuthors() {
   const query = `#graphql
@@ -124,6 +130,63 @@ export async function getRecipe(documentId: string) {
   const data = await strapiGQLQuery<RecipesQuery>({
     query,
     variables: { filters: { documentId: { eq: documentId } } },
+  });
+
+  if (!data) {
+    throw new Error("No data");
+  }
+
+  return data;
+}
+
+export async function getRelatedRecipes(categories: string[]) {
+  const query = `#graphql
+    query Query($filters: RecipeFiltersInput, $pagination: PaginationArg) {
+      recipes(filters: $filters, pagination: $pagination) {
+        documentId
+        name
+        image {
+          url
+        }
+      }
+    }
+  `;
+
+  const data = await strapiGQLQuery<RelatedRecipesQuery>({
+    query,
+    variables: {
+      filters: { categories: { name: { in: categories } } },
+      pagination: { limit: 5 },
+    },
+  });
+
+  if (!data) {
+    throw new Error("No data");
+  }
+
+  return data;
+}
+
+export async function getFilters() {
+  const query = `#graphql
+    query Categories {
+      authors {
+        name
+        documentId
+      }
+      courses {
+        name
+        documentId
+      }
+      categories {
+        name
+        documentId
+      }
+    }
+  `;
+
+  const data = await strapiGQLQuery<CategoryCoursesAuthorsQuery>({
+    query,
   });
 
   if (!data) {

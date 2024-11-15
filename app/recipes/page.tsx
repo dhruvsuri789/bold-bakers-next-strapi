@@ -2,6 +2,7 @@ import { getFilters } from "@/graphql/queries";
 import Container from "../_components/Container";
 import Nav from "../_components/Nav";
 import SearchRecipes from "../_components/SearchRecipes";
+import SearchRecipesResult from "../_components/SearchRecipesResult";
 
 interface RecipesPageProps {
   searchParams: { [key: string]: string | undefined };
@@ -21,7 +22,9 @@ async function RecipesPage({ searchParams }: RecipesPageProps) {
             <span className="text-red-600">one single place</span>
           </h1>
         </div>
-        <SearchRecipes filters={filters} />
+        <SearchRecipes filters={filters}>
+          <SearchRecipesResult searchParams={searchParams} />
+        </SearchRecipes>
       </main>
     </Container>
   );

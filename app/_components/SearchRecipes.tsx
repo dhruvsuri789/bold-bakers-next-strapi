@@ -2,9 +2,8 @@
 
 import { Input } from "@/app/_components/ui/input";
 import { CategoryCoursesAuthorsQuery } from "@/graphql/types";
-import { useQueryState, parseAsArrayOf, parseAsString } from "nuqs";
+import { parseAsArrayOf, parseAsString, useQueryState } from "nuqs";
 import { useRef } from "react";
-import SearchRecipesResult from "./SearchRecipesResult";
 
 /* 
 {
@@ -17,9 +16,10 @@ import SearchRecipesResult from "./SearchRecipesResult";
 
 interface SearchRecipesProps {
   filters: CategoryCoursesAuthorsQuery;
+  children: React.ReactNode;
 }
 
-function SearchRecipes({ filters }: SearchRecipesProps) {
+function SearchRecipes({ filters, children }: SearchRecipesProps) {
   const { authors, categories, courses } = filters;
 
   const [category, setCategory] = useQueryState(
@@ -195,13 +195,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
       </div>
       <div className="bg-slate-200">
         <div>Filterby and sort</div>
-        <SearchRecipesResult
-          category={category}
-          author={author}
-          course={course}
-          sortBy={sortBy}
-          name={name}
-        />
+        {children}
       </div>
     </div>
   );

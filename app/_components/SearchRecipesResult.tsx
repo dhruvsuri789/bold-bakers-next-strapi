@@ -1,20 +1,9 @@
 interface SearchRecipesResultProps {
-  category: string[] | null;
-  author: string[] | null;
-  course: string[] | null;
-  sortBy: string | null;
-  name: string | null;
+  searchParams: { [key: string]: string | undefined };
 }
 
-function SearchRecipesResult({
-  category,
-  author,
-  course,
-  sortBy,
-  name,
-}: SearchRecipesResultProps) {
-  console.log(category, author, course, sortBy, name);
-
+function SearchRecipesResult({ searchParams }: SearchRecipesResultProps) {
+  console.log(searchParams);
   return <div></div>;
 }
 

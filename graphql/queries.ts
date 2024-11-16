@@ -198,13 +198,13 @@ export async function getFilters() {
 }
 
 export async function getSearchRecipes({
-  nonNullAuthors,
-  nonNullCategories,
-  nonNullCourses,
+  author,
+  category,
+  course,
 }: {
-  nonNullAuthors: string[];
-  nonNullCategories: string[];
-  nonNullCourses: string[];
+  author: string[];
+  category: string[];
+  course: string[];
 }) {
   const query = `#graphql
     query Query($filters: RecipeFiltersInput) {
@@ -226,21 +226,21 @@ export async function getSearchRecipes({
           {
             author: {
               name: {
-                in: nonNullAuthors,
+                in: author,
               },
             },
           },
           {
             categories: {
               name: {
-                in: nonNullCategories,
+                in: category,
               },
             },
           },
           {
             courses: {
               name: {
-                in: nonNullCourses,
+                in: course,
               },
             },
           },

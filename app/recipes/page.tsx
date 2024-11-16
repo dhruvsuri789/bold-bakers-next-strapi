@@ -3,7 +3,18 @@ import Container from "../_components/Container";
 import Nav from "../_components/Nav";
 import SearchRecipesParent from "../_components/SearchRecipesParent";
 
-async function RecipesPage() {
+export interface RecipesPageProps {
+  searchParams: {
+    category?: string;
+    author?: string;
+    course?: string;
+    sortBy?: string;
+    name?: string;
+  };
+}
+
+async function RecipesPage({ searchParams }: RecipesPageProps) {
+  console.log(searchParams);
   return (
     <Container>
       <Nav />
@@ -15,7 +26,7 @@ async function RecipesPage() {
           </h1>
         </div>
         <Suspense fallback={<SearchRecipesParent.Skeleton />}>
-          <SearchRecipesParent />
+          <SearchRecipesParent searchParams={searchParams} />
         </Suspense>
       </main>
     </Container>

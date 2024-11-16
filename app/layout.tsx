@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter, Lora } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import "./globals.css";
-import ReactQueryProvider from "./_components/ReactQueryProvider";
 
 const lora = Lora({
   subsets: ["latin"],
@@ -29,9 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${lora.variable} ${inter.variable}`}>
       <body className="antialiased text-neutral-900 bg-red-100">
-        <ReactQueryProvider>
-          <NuqsAdapter>{children}</NuqsAdapter>
-        </ReactQueryProvider>
+        <NuqsAdapter>{children}</NuqsAdapter>
       </body>
     </html>
   );

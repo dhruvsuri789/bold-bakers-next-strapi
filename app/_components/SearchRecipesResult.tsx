@@ -1,45 +1,20 @@
-"use client";
-
-import { getSearchData } from "@/app/actions/actions";
-import { useQuery } from "@tanstack/react-query";
+import { getSearchRecipes } from "@/graphql/queries";
+import { RecipesPageProps } from "../recipes/page";
 import RecipeItem from "./RecipeItem";
 import { Skeleton } from "./ui/skeleton";
 
-interface SearchRecipesResultProps {
-  categories: string[] | null;
-  authors: string[] | null;
-  courses: string[] | null;
-  sortBy: string | null;
-  name: string | null;
-}
+async function SearchRecipesResult({ searchParams }: RecipesPageProps) {
+  const {
+    author: authors,
+    category: categories,
+    course: courses,
+  } = searchParams;
 
-function SearchRecipesResult({
-  categories,
-  authors,
-  courses,
-  sortBy,
-  name,
-}: SearchRecipesResultProps) {
-  const { isPending, error, data } = useQuery({
-    queryKey: ["recipesData"],
-    queryFn: async () => {
-      return await getSearchData({ authors, categories, courses });
-    },
-  });
+  const author = Array.isArray(authors) ? authors.split(",") : [];
+  const category = Array.isArray(categories) ? categories.split(",") : [];
+  const course = Array.isArray(courses) ? courses.split(",") : [];
 
-  if (isPending) {
-    return <SkeletonRecipes />;
-  }
-
-  // TODO Add Empty page for recipes
-  if (!data) {
-    return null;
-  }
-
-  // TODO Add Error page for recipes
-  if (error) {
-    return null;
-  }
+  const data = await getSearchRecipes({ author, category, course });
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-8 w-full">

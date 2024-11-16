@@ -1,10 +1,19 @@
 import { getFilters } from "@/graphql/queries";
 import SearchRecipes from "./SearchRecipes";
 import { Skeleton } from "./ui/skeleton";
+import { RecipesPageProps } from "../recipes/page";
+import SearchRecipesResult from "./SearchRecipesResult";
+import { Suspense } from "react";
 
-async function SearchRecipesParent() {
+async function SearchRecipesParent({ searchParams }: RecipesPageProps) {
   const filters = await getFilters();
-  return <SearchRecipes filters={filters} />;
+  return (
+    <SearchRecipes filters={filters}>
+      <Suspense fallback={<SearchRecipesResult.Skeleton />}>
+        <SearchRecipesResult searchParams={searchParams} />
+      </Suspense>
+    </SearchRecipes>
+  );
 }
 
 function SkeletonSearchRecipesParent() {

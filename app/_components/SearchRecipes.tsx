@@ -2,10 +2,9 @@
 
 import { Input } from "@/app/_components/ui/input";
 import { CategoryCoursesAuthorsQuery } from "@/graphql/types";
+import { useRouter, useSearchParams } from "next/navigation";
 import { parseAsArrayOf, parseAsString, useQueryState } from "nuqs";
-import { useRef } from "react";
-import SearchRecipesResult from "./SearchRecipesResult";
-import { useQueryClient } from "@tanstack/react-query";
+import qs from "query-string";
 
 /* 
 {
@@ -18,10 +17,12 @@ import { useQueryClient } from "@tanstack/react-query";
 
 interface SearchRecipesProps {
   filters: CategoryCoursesAuthorsQuery;
+  children: React.ReactNode;
 }
 
-function SearchRecipes({ filters }: SearchRecipesProps) {
-  const queryClient = useQueryClient();
+function SearchRecipes({ filters, children }: SearchRecipesProps) {
+  const router = useRouter();
+  const params = useSearchParams();
   const { authors, categories, courses } = filters;
 
   const [category, setCategory] = useQueryState(
@@ -42,61 +43,129 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
   const [sortBy, setSortBy] = useQueryState("sortby");
   const [name, setName] = useQueryState("name");
 
-  const searchInputRef = useRef<HTMLInputElement>(null);
-
   // Function to toggle categories
-  const toggleCategory = (value: string) => {
-    if (!category) {
-      setCategory([value]);
-      queryClient.invalidateQueries({ queryKey: ["recipesData"] });
-      return;
+  const toggleCategory = async (value: string) => {
+    try {
+      if (!category) {
+        await setCategory([value]);
+      } else {
+        const updatedCategory = category.includes(value)
+          ? category.filter((cat) => cat !== value)
+          : [...category, value];
+        await setCategory(updatedCategory);
+      }
+
+      // Get the latest params after state update
+      const currentQuery = qs.parse(params.toString());
+      const url = qs.stringifyUrl(
+        {
+          url: "/recipes",
+          query: currentQuery,
+        },
+        { skipNull: true }
+      );
+      router.replace(url, { scroll: false });
+    } catch (error) {
+      console.error("Error updating category:", error);
     }
-    const updatedCategory = category.includes(value)
-      ? category.filter((cat) => cat !== value)
-      : [...category, value];
-    setCategory(updatedCategory); // Updates URL to reflect selected categories
-    queryClient.invalidateQueries({ queryKey: ["recipesData"] });
   };
 
   // Function to toggle authors
-  const toggleAuthor = (value: string) => {
-    if (!author) {
-      setAuthor([value]);
-      queryClient.invalidateQueries({ queryKey: ["recipesData"] });
-      return;
+  const toggleAuthor = async (value: string) => {
+    try {
+      if (!author) {
+        await setAuthor([value]);
+      } else {
+        const updatedAuthor = author.includes(value)
+          ? author.filter((auth) => auth !== value)
+          : [...author, value];
+        await setAuthor(updatedAuthor);
+      }
+
+      // Get the latest params after state update
+      const currentQuery = qs.parse(params.toString());
+      const url = qs.stringifyUrl(
+        {
+          url: "/recipes",
+          query: currentQuery,
+        },
+        { skipNull: true }
+      );
+      router.replace(url, { scroll: false });
+    } catch (error) {
+      console.error("Error updating author:", error);
     }
-    const updatedAuthor = author.includes(value)
-      ? author.filter((auth) => auth !== value)
-      : [...author, value];
-    setAuthor(updatedAuthor); // Updates URL to reflect selected authors
-    queryClient.invalidateQueries({ queryKey: ["recipesData"] });
   };
 
   // Function to toggle courses
-  const toggleCourse = (value: string) => {
-    if (!course) {
-      setCourse([value]);
-      queryClient.invalidateQueries({ queryKey: ["recipesData"] });
-      return;
+  const toggleCourse = async (value: string) => {
+    try {
+      if (!course) {
+        await setCourse([value]);
+      } else {
+        const updatedCourse = course.includes(value)
+          ? course.filter((cours) => cours !== value)
+          : [...course, value];
+        await setCourse(updatedCourse);
+      }
+
+      // Get the latest params after state update
+      const currentQuery = qs.parse(params.toString());
+      const url = qs.stringifyUrl(
+        {
+          url: "/recipes",
+          query: currentQuery,
+        },
+        { skipNull: true }
+      );
+      router.replace(url, { scroll: false });
+    } catch (error) {
+      console.error("Error updating course:", error);
     }
-    const updatedCourse = course.includes(value)
-      ? course.filter((cours) => cours !== value)
-      : [...course, value];
-    setCourse(updatedCourse); // Updates URL to reflect selected courses
-    queryClient.invalidateQueries({ queryKey: ["recipesData"] });
   };
 
-  function handleReset() {
-    setCategory([]);
-    setAuthor([]);
-    setCourse([]);
-    setSortBy(null);
-    setName(null);
+  const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      await setName(e.target.value || null);
 
-    if (searchInputRef.current) {
-      searchInputRef.current.value = "";
+      // Get the latest params after state update
+      const currentQuery = qs.parse(params.toString());
+      const url = qs.stringifyUrl(
+        {
+          url: "/recipes",
+          query: currentQuery,
+        },
+        { skipNull: true }
+      );
+      router.replace(url, { scroll: false });
+    } catch (error) {
+      console.error("Error updating search:", error);
     }
-    queryClient.invalidateQueries({ queryKey: ["recipesData"] });
+  };
+
+  async function handleReset() {
+    try {
+      await Promise.all([
+        setCategory([]),
+        setAuthor([]),
+        setCourse([]),
+        setSortBy(null),
+        setName(null),
+      ]);
+
+      // Get the latest params after state update
+      const currentQuery = qs.parse(params.toString());
+      const url = qs.stringifyUrl(
+        {
+          url: "/recipes",
+          query: currentQuery,
+        },
+        { skipNull: true }
+      );
+      router.replace(url, { scroll: false });
+    } catch (error) {
+      console.error("Error resetting filters:", error);
+    }
   }
 
   return (
@@ -105,8 +174,8 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
         <Input
           type="text"
           placeholder="Search recipes by name"
-          onChange={(e) => setName(e.target.value)}
-          ref={searchInputRef}
+          value={name || ""}
+          onChange={handleSearchChange}
         />
         <div className="grid grid-cols-[1fr,auto] gap-2 pt-4">
           <p className="max-w-40">
@@ -127,7 +196,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
               className="underline text-neutral-600 hover:text-red-500 transition-colors"
               onClick={() => {
                 setCategory([]);
-                queryClient.invalidateQueries({ queryKey: ["recipesData"] });
+                handleReset();
               }}
             >
               Clear
@@ -157,7 +226,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
               className="underline text-neutral-600 hover:text-red-500 transition-colors"
               onClick={() => {
                 setAuthor([]);
-                queryClient.invalidateQueries({ queryKey: ["recipesData"] });
+                handleReset();
               }}
             >
               Clear
@@ -187,7 +256,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
               className="underline text-neutral-600 hover:text-red-500 transition-colors"
               onClick={() => {
                 setCourse([]);
-                queryClient.invalidateQueries({ queryKey: ["recipesData"] });
+                handleReset();
               }}
             >
               Clear
@@ -213,13 +282,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
       </div>
       <div className="">
         <div>Filterby and sort</div>
-        <SearchRecipesResult
-          categories={category}
-          authors={author}
-          courses={course}
-          sortBy={sortBy}
-          name={name}
-        />
+        {children}
       </div>
     </div>
   );

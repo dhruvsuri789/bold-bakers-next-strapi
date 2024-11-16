@@ -1,16 +1,9 @@
-import { getFilters } from "@/graphql/queries";
+import { Suspense } from "react";
 import Container from "../_components/Container";
 import Nav from "../_components/Nav";
-import SearchRecipes from "../_components/SearchRecipes";
+import SearchRecipesParent from "../_components/SearchRecipesParent";
 
-interface RecipesPageProps {
-  searchParams: { [key: string]: string | undefined };
-}
-
-async function RecipesPage({ searchParams }: RecipesPageProps) {
-  const filters = await getFilters();
-  console.log(searchParams);
-
+async function RecipesPage() {
   return (
     <Container>
       <Nav />
@@ -21,7 +14,9 @@ async function RecipesPage({ searchParams }: RecipesPageProps) {
             <span className="text-red-600">one single place</span>
           </h1>
         </div>
-        <SearchRecipes filters={filters} />
+        <Suspense fallback={<SearchRecipesParent.Skeleton />}>
+          <SearchRecipesParent />
+        </Suspense>
       </main>
     </Container>
   );

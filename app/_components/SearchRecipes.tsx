@@ -2,9 +2,10 @@
 
 import { Input } from "@/app/_components/ui/input";
 import { CategoryCoursesAuthorsQuery } from "@/graphql/types";
-import { useQueryState, parseAsArrayOf, parseAsString } from "nuqs";
+import { parseAsArrayOf, parseAsString, useQueryState } from "nuqs";
 import { useRef } from "react";
 import SearchRecipesResult from "./SearchRecipesResult";
+import { useQueryClient } from "@tanstack/react-query";
 
 /* 
 {
@@ -20,6 +21,7 @@ interface SearchRecipesProps {
 }
 
 function SearchRecipes({ filters }: SearchRecipesProps) {
+  const queryClient = useQueryClient();
   const { authors, categories, courses } = filters;
 
   const [category, setCategory] = useQueryState(
@@ -46,36 +48,42 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
   const toggleCategory = (value: string) => {
     if (!category) {
       setCategory([value]);
+      queryClient.invalidateQueries({ queryKey: ["recipesData"] });
       return;
     }
     const updatedCategory = category.includes(value)
       ? category.filter((cat) => cat !== value)
       : [...category, value];
     setCategory(updatedCategory); // Updates URL to reflect selected categories
+    queryClient.invalidateQueries({ queryKey: ["recipesData"] });
   };
 
   // Function to toggle authors
   const toggleAuthor = (value: string) => {
     if (!author) {
       setAuthor([value]);
+      queryClient.invalidateQueries({ queryKey: ["recipesData"] });
       return;
     }
     const updatedAuthor = author.includes(value)
       ? author.filter((auth) => auth !== value)
       : [...author, value];
     setAuthor(updatedAuthor); // Updates URL to reflect selected authors
+    queryClient.invalidateQueries({ queryKey: ["recipesData"] });
   };
 
   // Function to toggle courses
   const toggleCourse = (value: string) => {
     if (!course) {
       setCourse([value]);
+      queryClient.invalidateQueries({ queryKey: ["recipesData"] });
       return;
     }
     const updatedCourse = course.includes(value)
       ? course.filter((cours) => cours !== value)
       : [...course, value];
     setCourse(updatedCourse); // Updates URL to reflect selected courses
+    queryClient.invalidateQueries({ queryKey: ["recipesData"] });
   };
 
   function handleReset() {
@@ -88,6 +96,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
     if (searchInputRef.current) {
       searchInputRef.current.value = "";
     }
+    queryClient.invalidateQueries({ queryKey: ["recipesData"] });
   }
 
   return (
@@ -116,7 +125,10 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
             <span className="font-bold text-xl">Categories</span>
             <button
               className="underline text-neutral-600 hover:text-red-500 transition-colors"
-              onClick={() => setCategory([])}
+              onClick={() => {
+                setCategory([]);
+                queryClient.invalidateQueries({ queryKey: ["recipesData"] });
+              }}
             >
               Clear
             </button>
@@ -143,7 +155,10 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
             <span className="font-bold text-xl">Authors</span>
             <button
               className="underline text-neutral-600 hover:text-red-500 transition-colors"
-              onClick={() => setAuthor([])}
+              onClick={() => {
+                setAuthor([]);
+                queryClient.invalidateQueries({ queryKey: ["recipesData"] });
+              }}
             >
               Clear
             </button>
@@ -170,7 +185,10 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
             <span className="font-bold text-xl">Courses</span>
             <button
               className="underline text-neutral-600 hover:text-red-500 transition-colors"
-              onClick={() => setCourse([])}
+              onClick={() => {
+                setCourse([]);
+                queryClient.invalidateQueries({ queryKey: ["recipesData"] });
+              }}
             >
               Clear
             </button>
@@ -193,12 +211,12 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
           </div>
         </div>
       </div>
-      <div className="bg-slate-200">
+      <div className="">
         <div>Filterby and sort</div>
         <SearchRecipesResult
-          category={category}
-          author={author}
-          course={course}
+          categories={category}
+          authors={author}
+          courses={course}
           sortBy={sortBy}
           name={name}
         />

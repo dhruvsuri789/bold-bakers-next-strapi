@@ -132,3 +132,13 @@ export type AuthorsQuery = {
 export type CategoryCoursesAuthorsQuery = CoursesQuery &
   AuthorsQuery &
   CategoriesQuery;
+
+export type RecipeSearchQuery = {
+  recipes: {
+    documentId: string;
+    name: string;
+    image: {
+      url: string;
+    };
+  }[];
+};

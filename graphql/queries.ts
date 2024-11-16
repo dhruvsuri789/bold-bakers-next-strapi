@@ -4,6 +4,7 @@ import {
   AuthorsQuery,
   CategoryCoursesAuthorsQuery,
   HomepageSectionsQuery,
+  RecipeSearchQuery,
   RecipesQuery,
   RelatedRecipesQuery,
 } from "./types";
@@ -187,6 +188,65 @@ export async function getFilters() {
 
   const data = await strapiGQLQuery<CategoryCoursesAuthorsQuery>({
     query,
+  });
+
+  if (!data) {
+    throw new Error("No data");
+  }
+
+  return data;
+}
+
+export async function getSearchRecipes({
+  nonNullAuthors,
+  nonNullCategories,
+  nonNullCourses,
+}: {
+  nonNullAuthors: string[];
+  nonNullCategories: string[];
+  nonNullCourses: string[];
+}) {
+  const query = `#graphql
+    query Query($filters: RecipeFiltersInput) {
+      recipes(filters: $filters) {
+        name
+        documentId
+        image {
+          url
+        }
+      }
+    }
+  `;
+
+  const data = await strapiGQLQuery<RecipeSearchQuery>({
+    query,
+    variables: {
+      filters: {
+        or: [
+          {
+            author: {
+              name: {
+                in: nonNullAuthors,
+              },
+            },
+          },
+          {
+            categories: {
+              name: {
+                in: nonNullCategories,
+              },
+            },
+          },
+          {
+            courses: {
+              name: {
+                in: nonNullCourses,
+              },
+            },
+          },
+        ],
+      },
+    },
   });
 
   if (!data) {

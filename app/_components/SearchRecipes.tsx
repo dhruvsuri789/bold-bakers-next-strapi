@@ -86,6 +86,11 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
     queryClient.invalidateQueries({ queryKey: ["recipesData"] });
   };
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value || null);
+    queryClient.invalidateQueries({ queryKey: ["recipesData"] });
+  };
+
   function handleReset() {
     setCategory([]);
     setAuthor([]);

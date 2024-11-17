@@ -21,12 +21,13 @@ function SearchRecipesResult({
   name,
 }: SearchRecipesResultProps) {
   const { isPending, error, data } = useQuery({
-    queryKey: ["recipesData", author, category, course, sortBy, name ],
+    queryKey: ["recipesData", author, category, course, sortBy, name],
     queryFn: async () => {
       // await new Promise((resolve) => {
       //   setTimeout(resolve, 2000);
       // });
-      return await getSearchData({ author, category, course });
+      console.log({ author, category, course, name });
+      return await getSearchData({ author, category, course, name });
     },
   });
 

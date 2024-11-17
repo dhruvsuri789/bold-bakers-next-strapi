@@ -201,10 +201,12 @@ export async function getSearchRecipes({
   nonNullAuthors,
   nonNullCategories,
   nonNullCourses,
+  nonNullName,
 }: {
   nonNullAuthors: string[];
   nonNullCategories: string[];
   nonNullCourses: string[];
+  nonNullName: string;
 }) {
   const query = `#graphql
     query Query($filters: RecipeFiltersInput) {
@@ -219,8 +221,10 @@ export async function getSearchRecipes({
   `;
 
   // Only add filters if any arrays have values
-  const hasFilters = nonNullAuthors.length > 0 || nonNullCategories.length > 0 || nonNullCourses.length > 0;
-  
+  const hasFilters =
+    nonNullAuthors.length > 0 ||
+    nonNullCategories.length > 0 ||
+    nonNullCourses.length > 0;
 
   // const data = await strapiGQLQuery<RecipeSearchQuery>({
   //   query,
@@ -253,34 +257,113 @@ export async function getSearchRecipes({
   //   },
   // });
 
+  // const data = await strapiGQLQuery<RecipeSearchQuery>({
+  //   query,
+  //   variables: {
+  //     filters: hasFilters
+  //       ? {
+  //           or: [
+  //             ...(nonNullAuthors.length > 0
+  //               ? [
+  //                   {
+  //                     author: {
+  //                       name: {
+  //                         in: nonNullAuthors,
+  //                       },
+  //                     },
+  //                   },
+  //                 ]
+  //               : []),
+  //             ...(nonNullCategories.length > 0
+  //               ? [
+  //                   {
+  //                     categories: {
+  //                       name: {
+  //                         in: nonNullCategories,
+  //                       },
+  //                     },
+  //                   },
+  //                 ]
+  //               : []),
+  //             ...(nonNullCourses.length > 0
+  //               ? [
+  //                   {
+  //                     courses: {
+  //                       name: {
+  //                         in: nonNullCourses,
+  //                       },
+  //                     },
+  //                   },
+  //                 ]
+  //               : []),
+  //           ],
+  //           name: {
+  //             contains: nonNullName,
+  //           },
+  //         }
+  //       : {},
+  //   },
+  // });
+
   const data = await strapiGQLQuery<RecipeSearchQuery>({
     query,
     variables: {
-      filters: hasFilters ? {
-        or: [
-          ...(nonNullAuthors.length > 0 ? [{
-            author: {
-              name: {
-                in: nonNullAuthors,
-              },
-            },
-          }] : []),
-          ...(nonNullCategories.length > 0 ? [{
-            categories: {
-              name: {
-                in: nonNullCategories,
-              },
-            },
-          }] : []),
-          ...(nonNullCourses.length > 0 ? [{
-            courses: {
-              name: {
-                in: nonNullCourses,
-              },
-            },
-          }] : []),
+      filters: {
+        and: [
+          // Name filter (if exists)
+          ...(nonNullName
+            ? [
+                {
+                  name: {
+                    contains: nonNullName,
+                  },
+                },
+              ]
+            : []),
+          // Other filters in OR condition (if any exist)
+          ...(hasFilters
+            ? [
+                {
+                  or: [
+                    ...(nonNullAuthors.length > 0
+                      ? [
+                          {
+                            author: {
+                              name: {
+                                in: nonNullAuthors,
+                              },
+                            },
+                          },
+                        ]
+                      : []),
+                    ...(nonNullCategories.length > 0
+                      ? [
+                          {
+                            categories: {
+                              name: {
+                                in: nonNullCategories,
+                              },
+                            },
+                          },
+                        ]
+                      : []),
+                    ...(nonNullCourses.length > 0
+                      ? [
+                          {
+                            courses: {
+                              name: {
+                                in: nonNullCourses,
+                              },
+                            },
+                          },
+                        ]
+                      : []),
+                  ],
+                },
+              ]
+            : []),
         ],
-      } : {},
+      },
     },
   });
 

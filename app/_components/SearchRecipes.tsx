@@ -2,8 +2,19 @@
 
 import { Input } from "@/app/_components/ui/input";
 import { CategoryCoursesAuthorsQuery } from "@/graphql/types";
+import { debounce } from "lodash";
 import { parseAsArrayOf, parseAsString, useQueryState } from "nuqs";
 import SearchRecipesResult from "./SearchRecipesResult";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { useState } from "react";
 
 /* 
 {
@@ -11,8 +22,25 @@ import SearchRecipesResult from "./SearchRecipesResult";
   author: [ 'Emily', 'Emma' ],
   course: [ 'Desserts', 'Breakfast' ],
 }
-
+to ->
+{
+  category: { 'Cheesecakes', "Emma's Best Recipes" },
+  author: { 'Emily', 'Emma' },
+  course: { 'Desserts', 'Breakfast' },
+}
 */
+
+const debounceSearch = debounce(
+  async (searchText: string, setter: (name: string) => void) => {
+    console.log(searchText);
+    if (!searchText || searchText.length < 3) {
+      setter("");
+      return;
+    }
+    setter(searchText);
+  },
+  500
+);
 
 interface SearchRecipesProps {
   filters: CategoryCoursesAuthorsQuery;
@@ -20,6 +48,7 @@ interface SearchRecipesProps {
 
 function SearchRecipes({ filters }: SearchRecipesProps) {
   const { authors, categories, courses } = filters;
+  const [inputValue, setInputValue] = useState("");
 
   const [category, setCategory] = useQueryState(
     "category",
@@ -38,7 +67,6 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
 
   const [sortBy, setSortBy] = useQueryState("sortby");
   const [name, setName] = useQueryState("name");
-
 
   // Function to toggle categories
   const toggleCategory = (value: string) => {
@@ -68,19 +96,12 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
   const toggleCourse = (value: string) => {
     if (!course) {
       setCourse([value]);
-   
       return;
     }
     const updatedCourse = course.includes(value)
       ? course.filter((cours) => cours !== value)
       : [...course, value];
     setCourse(updatedCourse); // Updates URL to reflect selected courses
- 
-  };
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value || null);
- 
   };
 
   function handleReset() {
@@ -88,19 +109,22 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
     setAuthor([]);
     setCourse([]);
     setSortBy(null);
-    setName("");
-
- 
+    setName(null);
   }
 
   return (
     <div className="grid grid-cols-[300px,1fr] gap-8">
       <div className="border-slate-200 border rounded-xl flex flex-col gap-4 p-6 divide-y-2">
         <Input
-          type="text"
-          placeholder="Search recipes by name"
-          onChange={handleSearchChange}
-          value={name ?? ""}
+          type="search"
+          placeholder="Search recipes... (min. 3 characters)"
+          className="w-full"
+          value={inputValue}
+          onChange={(e) => {
+            const value = e.target.value;
+            setInputValue(value);
+            debounceSearch(value, setName);
+          }}
         />
         <div className="grid grid-cols-[1fr,auto] gap-2 pt-4">
           <p className="max-w-40">
@@ -202,8 +226,48 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
           </div>
         </div>
       </div>
-      <div className="">
-        <div>Filterby and sort</div>
+      <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-[1fr,auto] p-4 border border-slate-200 rounded-xl">
+          <div className="grid grid-cols-[auto,1fr] items-center">
+            <span className="text-sm text-neutral-600">Filtered by:</span>
+            <div className="flex gap-2 items-center flex-wrap">
+              {name && (
+                <span className="font-semibold ml-2 bg-violet-600 px-4 py-2 text-neutral-50 rounded-full">
+                  Name: {name}
+                </span>
+              )}
+              {category && category.length > 0 && (
+                <span className="font-semibold ml-2 bg-red-500 px-4 py-2 text-neutral-50 rounded-full">
+                  Categories: {category.join(", ")}
+                </span>
+              )}
+              {author && author.length > 0 && (
+                <span className="font-semibold ml-2 bg-green-700 px-4 py-2 text-neutral-50 rounded-full">
+                  {" "}
+                  Authors: {author.join(", ")}
+                </span>
+              )}
+              {course && course.length > 0 && (
+                <span className="font-semibold ml-2 bg-blue-700 px-4 py-2 text-neutral-50 rounded-full">
+                  {" "}
+                  Courses: {course.join(", ")}
+                </span>
+              )}
+            </div>
+          </div>
+          <Select>
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder="Sort" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Sort by name:</SelectLabel>
+                <SelectItem value="asc">Asc: A - Z</SelectItem>
+                <SelectItem value="desc">Desc: Z - A</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
         <SearchRecipesResult
           category={category}
           author={author}

@@ -70,7 +70,9 @@ async function RecipePage({ params }: RecipePageProps) {
             {categories.map((category, index) => (
               <span className="flex gap-4" key={`${category.name}-${index}`}>
                 <Link
-                  href={`/recipes?category=${category.name}`}
+                  href={`/recipes?category=${encodeURIComponent(
+                    category.name
+                  )}`}
                   className="hover:text-red-500 transition-colors"
                 >
                   {category.name}
@@ -88,7 +90,7 @@ async function RecipePage({ params }: RecipePageProps) {
                 {
                   <Link
                     className="font-semibold text-red-600 hover:text-red-500 transition-colors"
-                    href={`/recipes?author=${author.name}`}
+                    href={`/recipes?author=${encodeURIComponent(author.name)}`}
                   >
                     {author.name}
                   </Link>

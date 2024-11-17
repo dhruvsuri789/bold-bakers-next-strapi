@@ -3,9 +3,7 @@
 import { Input } from "@/app/_components/ui/input";
 import { CategoryCoursesAuthorsQuery } from "@/graphql/types";
 import { parseAsArrayOf, parseAsString, useQueryState } from "nuqs";
-import { useRef } from "react";
 import SearchRecipesResult from "./SearchRecipesResult";
-import { useQueryClient } from "@tanstack/react-query";
 
 /* 
 {
@@ -21,7 +19,6 @@ interface SearchRecipesProps {
 }
 
 function SearchRecipes({ filters }: SearchRecipesProps) {
-  const queryClient = useQueryClient();
   const { authors, categories, courses } = filters;
 
   const [category, setCategory] = useQueryState(
@@ -42,53 +39,48 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
   const [sortBy, setSortBy] = useQueryState("sortby");
   const [name, setName] = useQueryState("name");
 
-  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Function to toggle categories
   const toggleCategory = (value: string) => {
     if (!category) {
       setCategory([value]);
-      queryClient.invalidateQueries({ queryKey: ["recipesData"] });
       return;
     }
     const updatedCategory = category.includes(value)
       ? category.filter((cat) => cat !== value)
       : [...category, value];
     setCategory(updatedCategory); // Updates URL to reflect selected categories
-    queryClient.invalidateQueries({ queryKey: ["recipesData"] });
   };
 
   // Function to toggle authors
   const toggleAuthor = (value: string) => {
     if (!author) {
       setAuthor([value]);
-      queryClient.invalidateQueries({ queryKey: ["recipesData"] });
       return;
     }
     const updatedAuthor = author.includes(value)
       ? author.filter((auth) => auth !== value)
       : [...author, value];
     setAuthor(updatedAuthor); // Updates URL to reflect selected authors
-    queryClient.invalidateQueries({ queryKey: ["recipesData"] });
   };
 
   // Function to toggle courses
   const toggleCourse = (value: string) => {
     if (!course) {
       setCourse([value]);
-      queryClient.invalidateQueries({ queryKey: ["recipesData"] });
+   
       return;
     }
     const updatedCourse = course.includes(value)
       ? course.filter((cours) => cours !== value)
       : [...course, value];
     setCourse(updatedCourse); // Updates URL to reflect selected courses
-    queryClient.invalidateQueries({ queryKey: ["recipesData"] });
+ 
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value || null);
-    queryClient.invalidateQueries({ queryKey: ["recipesData"] });
+ 
   };
 
   function handleReset() {
@@ -96,12 +88,9 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
     setAuthor([]);
     setCourse([]);
     setSortBy(null);
-    setName(null);
+    setName("");
 
-    if (searchInputRef.current) {
-      searchInputRef.current.value = "";
-    }
-    queryClient.invalidateQueries({ queryKey: ["recipesData"] });
+ 
   }
 
   return (
@@ -110,8 +99,8 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
         <Input
           type="text"
           placeholder="Search recipes by name"
-          onChange={(e) => setName(e.target.value)}
-          ref={searchInputRef}
+          onChange={handleSearchChange}
+          value={name ?? ""}
         />
         <div className="grid grid-cols-[1fr,auto] gap-2 pt-4">
           <p className="max-w-40">
@@ -132,7 +121,6 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
               className="underline text-neutral-600 hover:text-red-500 transition-colors"
               onClick={() => {
                 setCategory([]);
-                queryClient.invalidateQueries({ queryKey: ["recipesData"] });
               }}
             >
               Clear
@@ -162,7 +150,6 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
               className="underline text-neutral-600 hover:text-red-500 transition-colors"
               onClick={() => {
                 setAuthor([]);
-                queryClient.invalidateQueries({ queryKey: ["recipesData"] });
               }}
             >
               Clear
@@ -192,7 +179,6 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
               className="underline text-neutral-600 hover:text-red-500 transition-colors"
               onClick={() => {
                 setCourse([]);
-                queryClient.invalidateQueries({ queryKey: ["recipesData"] });
               }}
             >
               Clear
@@ -219,9 +205,9 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
       <div className="">
         <div>Filterby and sort</div>
         <SearchRecipesResult
-          categories={category}
-          authors={author}
-          courses={course}
+          category={category}
+          author={author}
+          course={course}
           sortBy={sortBy}
           name={name}
         />

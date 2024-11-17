@@ -3,17 +3,17 @@
 import { getSearchRecipes } from "@/graphql/queries";
 
 export async function getSearchData({
-  authors,
-  categories,
-  courses,
+  author,
+  category,
+  course,
 }: {
-  authors: string[] | null;
-  categories: string[] | null;
-  courses: string[] | null;
+  author: string[] | null;
+  category: string[] | null;
+  course: string[] | null;
 }) {
-  const nonNullAuthors = authors || [];
-  const nonNullCategories = categories || [];
-  const nonNullCourses = courses || [];
+  const nonNullAuthors = author?.length ? author : [];
+  const nonNullCategories = category?.length ? category : [];
+  const nonNullCourses = course?.length ? course : [];
 
   const data = await getSearchRecipes({
     nonNullAuthors,

@@ -6,24 +6,27 @@ import RecipeItem from "./RecipeItem";
 import { Skeleton } from "./ui/skeleton";
 
 interface SearchRecipesResultProps {
-  categories: string[] | null;
-  authors: string[] | null;
-  courses: string[] | null;
+  category: string[] | null;
+  author: string[] | null;
+  course: string[] | null;
   sortBy: string | null;
   name: string | null;
 }
 
 function SearchRecipesResult({
-  categories,
-  authors,
-  courses,
+  category,
+  author,
+  course,
   sortBy,
   name,
 }: SearchRecipesResultProps) {
   const { isPending, error, data } = useQuery({
-    queryKey: ["recipesData"],
+    queryKey: ["recipesData", author, category, course, sortBy, name ],
     queryFn: async () => {
-      return await getSearchData({ authors, categories, courses });
+      // await new Promise((resolve) => {
+      //   setTimeout(resolve, 2000);
+      // });
+      return await getSearchData({ author, category, course });
     },
   });
 
@@ -31,13 +34,13 @@ function SearchRecipesResult({
     return <SkeletonRecipes />;
   }
 
-  // TODO Add Empty page for recipes
-  if (!data) {
+  // TODO Add Error page for recipes
+  if (error) {
     return null;
   }
 
-  // TODO Add Error page for recipes
-  if (error) {
+  // TODO Add Empty page for recipes
+  if (!data) {
     return null;
   }
 

@@ -218,34 +218,69 @@ export async function getSearchRecipes({
     }
   `;
 
+  // Only add filters if any arrays have values
+  const hasFilters = nonNullAuthors.length > 0 || nonNullCategories.length > 0 || nonNullCourses.length > 0;
+  
+
+  // const data = await strapiGQLQuery<RecipeSearchQuery>({
+  //   query,
+  //   variables: {
+  //     filters:  {
+  //       or: [
+  //         {
+  //           author: {
+  //             name: {
+  //               in: nonNullAuthors,
+  //             },
+  //           },
+  //         },
+  //         {
+  //           categories: {
+  //             name: {
+  //               in: nonNullCategories,
+  //             },
+  //           },
+  //         },
+  //         {
+  //           courses: {
+  //             name: {
+  //               in: nonNullCourses,
+  //             },
+  //           },
+  //         },
+  //       ],
+  //     },
+  //   },
+  // });
+
   const data = await strapiGQLQuery<RecipeSearchQuery>({
     query,
     variables: {
-      filters: {
+      filters: hasFilters ? {
         or: [
-          {
+          ...(nonNullAuthors.length > 0 ? [{
             author: {
               name: {
                 in: nonNullAuthors,
               },
             },
-          },
-          {
+          }] : []),
+          ...(nonNullCategories.length > 0 ? [{
             categories: {
               name: {
                 in: nonNullCategories,
               },
             },
-          },
-          {
+          }] : []),
+          ...(nonNullCourses.length > 0 ? [{
             courses: {
               name: {
                 in: nonNullCourses,
               },
             },
-          },
+          }] : []),
         ],
-      },
+      } : {},
     },
   });
 

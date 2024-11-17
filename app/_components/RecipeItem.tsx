@@ -16,10 +16,10 @@ function RecipeItem({ recipe }: { recipe: Recipe }) {
       className="flex flex-col gap-2 group"
       href={`/recipe/${recipe.documentId}`}
     >
-      <div className="aspect-[3/4] relative rounded-3xl overflow-hidden group-hover:shadow-md transition-shadow border border-red-200">
+      <div className="aspect-[3/4] relative rounded-3xl overflow-hidden border border-red-200">
         <Image
           fill
-          className="object-cover"
+          className="object-cover group-hover:scale-105 transition-transform"
           src={`${BASE_URL}${recipe.image.url}`}
           alt={recipe.name}
         />

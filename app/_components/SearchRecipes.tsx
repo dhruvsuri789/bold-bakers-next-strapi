@@ -255,15 +255,19 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
               )}
             </div>
           </div>
-          <Select>
-            <SelectTrigger className="w-[120px]">
+          <Select onValueChange={(value) => setSortBy(value)}>
+            <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Sort" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectLabel>Sort by name:</SelectLabel>
-                <SelectItem value="asc">Asc: A - Z</SelectItem>
-                <SelectItem value="desc">Desc: Z - A</SelectItem>
+                <SelectLabel>Sort by:</SelectLabel>
+                <SelectItem value="name:asc">Name: A - Z</SelectItem>
+                <SelectItem value="name:desc">Name: Z - A</SelectItem>
+                <SelectItem value="publishedAt:asc">Published: Asc</SelectItem>
+                <SelectItem value="publishedAt:desc">
+                  Published: Desc
+                </SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>

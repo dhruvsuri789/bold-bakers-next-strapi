@@ -202,15 +202,17 @@ export async function getSearchRecipes({
   nonNullCategories,
   nonNullCourses,
   nonNullName,
+  nonNullSortBy,
 }: {
   nonNullAuthors: string[];
   nonNullCategories: string[];
   nonNullCourses: string[];
   nonNullName: string;
+  nonNullSortBy: string;
 }) {
   const query = `#graphql
-    query Query($filters: RecipeFiltersInput) {
-      recipes(filters: $filters) {
+    query Query($filters: RecipeFiltersInput, $sort: [String]) {
+      recipes(filters: $filters, sort: $sort) {
         name
         documentId
         image {
@@ -364,6 +366,7 @@ export async function getSearchRecipes({
             : []),
         ],
       },
+      sort: [nonNullSortBy],
     },
   });
 

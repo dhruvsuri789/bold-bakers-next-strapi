@@ -26,8 +26,8 @@ function SearchRecipesResult({
       // await new Promise((resolve) => {
       //   setTimeout(resolve, 2000);
       // });
-      console.log({ author, category, course, name });
-      return await getSearchData({ author, category, course, name });
+      console.log({ author, category, course, name, sortBy });
+      return await getSearchData({ author, category, course, name, sortBy });
     },
   });
 

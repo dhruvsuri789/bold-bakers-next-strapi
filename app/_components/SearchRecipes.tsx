@@ -44,11 +44,13 @@ const debounceSearch = debounce(
 
 interface SearchRecipesProps {
   filters: CategoryCoursesAuthorsQuery;
+  totalRecipes: number;
 }
 
-function SearchRecipes({ filters }: SearchRecipesProps) {
+function SearchRecipes({ filters, totalRecipes }: SearchRecipesProps) {
   const { authors, categories, courses } = filters;
   const [inputValue, setInputValue] = useState("");
+  const [recipeSearch, setRecipeSearch] = useState(0);
 
   const [category, setCategory] = useQueryState(
     "category",
@@ -128,8 +130,10 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
         />
         <div className="grid grid-cols-[1fr,auto] gap-2 pt-4">
           <p className="max-w-40">
-            Showing <span className="font-bold text-red-600">36</span> results
-            of <span className="font-bold text-red-600">36</span> items
+            Got <span className="font-bold text-red-600">{recipeSearch}</span>{" "}
+            results of{" "}
+            <span className="font-bold text-red-600">{totalRecipes}</span> total
+            recipes
           </p>
           <button
             className="underline text-red-600 hover:text-red-500 transition-colors"
@@ -255,7 +259,10 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
               )}
             </div>
           </div>
-          <Select onValueChange={(value) => setSortBy(value)}>
+          <Select
+            onValueChange={(value) => setSortBy(value)}
+            value={sortBy || ""}
+          >
             <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Sort" />
             </SelectTrigger>
@@ -278,6 +285,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
           course={course}
           sortBy={sortBy}
           name={name}
+          setRecipeSearch={setRecipeSearch}
         />
       </div>
     </div>

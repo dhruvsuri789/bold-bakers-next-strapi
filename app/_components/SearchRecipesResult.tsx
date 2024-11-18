@@ -4,6 +4,7 @@ import { getSearchData } from "@/app/actions/actions";
 import { useQuery } from "@tanstack/react-query";
 import RecipeItem from "./RecipeItem";
 import { Skeleton } from "./ui/skeleton";
+import { useEffect } from "react";
 
 interface SearchRecipesResultProps {
   category: string[] | null;
@@ -11,6 +12,7 @@ interface SearchRecipesResultProps {
   course: string[] | null;
   sortBy: string | null;
   name: string | null;
+  setRecipeSearch: (count: number) => void;
 }
 
 function SearchRecipesResult({
@@ -19,6 +21,7 @@ function SearchRecipesResult({
   course,
   sortBy,
   name,
+  setRecipeSearch,
 }: SearchRecipesResultProps) {
   const { isPending, error, data } = useQuery({
     queryKey: ["recipesData", author, category, course, sortBy, name],
@@ -26,10 +29,16 @@ function SearchRecipesResult({
       // await new Promise((resolve) => {
       //   setTimeout(resolve, 2000);
       // });
-      console.log({ author, category, course, name, sortBy });
+      // console.log({ author, category, course, name, sortBy });
       return await getSearchData({ author, category, course, name, sortBy });
     },
   });
+
+  useEffect(() => {
+    if (data?.recipes?.length) {
+      setRecipeSearch(data.recipes.length);
+    }
+  }, [data?.recipes.length, setRecipeSearch]);
 
   if (isPending) {
     return <SkeletonRecipes />;

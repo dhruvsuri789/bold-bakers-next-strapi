@@ -142,3 +142,9 @@ export type RecipeSearchQuery = {
     };
   }[];
 };
+
+export type RecipesCountQuery = {
+  recipes: {
+    documentId: string;
+  }[];
+};

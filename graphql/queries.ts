@@ -4,6 +4,7 @@ import {
   AuthorsQuery,
   CategoryCoursesAuthorsQuery,
   HomepageSectionsQuery,
+  RecipesCountQuery,
   RecipeSearchQuery,
   RecipesQuery,
   RelatedRecipesQuery,
@@ -375,4 +376,25 @@ export async function getSearchRecipes({
   }
 
   return data;
+}
+
+export async function getRecipesCount() {
+  const query = `#graphql
+    query RecipesCount {
+      recipes {
+        documentId
+      }
+    }
+  `;
+
+  const data = await strapiGQLQuery<RecipesCountQuery>({
+    query,
+    variables: {},
+  });
+
+  if (!data) {
+    throw new Error("No data");
+  }
+
+  return data.recipes.length;
 }

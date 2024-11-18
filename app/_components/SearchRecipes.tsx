@@ -115,19 +115,22 @@ function SearchRecipes({ filters, totalRecipes }: SearchRecipesProps) {
   }
 
   return (
-    <div className="grid grid-cols-[300px,1fr] gap-8">
-      <div className="border-slate-200 border rounded-xl flex flex-col gap-4 p-6 divide-y-2">
-        <Input
-          type="search"
-          placeholder="Search recipes... (min. 3 characters)"
-          className="w-full"
-          value={inputValue}
-          onChange={(e) => {
-            const value = e.target.value;
-            setInputValue(value);
-            debounceSearch(value, setName);
-          }}
-        />
+    <div className="grid grid-cols-[300px,1fr] gap-8 items-start">
+      <div className="border-slate-200 border rounded-xl grid grid-template-rows-[auto,1fr] gap-4 p-6 divide-y-2 h-[800px] overflow-y-scroll bg-neutral-50">
+        <div className="flex flex-col gap-2">
+          <span className="font-bold text-xl">Search</span>
+          <Input
+            type="search"
+            placeholder="Search recipes (min. 3 char)"
+            className="w-full h-12 rounded-lg"
+            value={inputValue}
+            onChange={(e) => {
+              const value = e.target.value;
+              setInputValue(value);
+              debounceSearch(value, setName);
+            }}
+          />
+        </div>
         <div className="grid grid-cols-[1fr,auto] gap-2 pt-4">
           <p className="max-w-40">
             Got <span className="font-bold text-red-600">{recipeSearch}</span>{" "}
@@ -157,15 +160,22 @@ function SearchRecipes({ filters, totalRecipes }: SearchRecipesProps) {
           <div className="flex flex-col gap-2">
             {categories.map((cat) => {
               return (
-                <div key={cat.name} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id={cat.name}
-                    checked={category?.includes(cat.name)}
-                    onChange={() => toggleCategory(cat.name)}
-                    className="accent-red-600 w-4 h-4"
-                  />
-                  <label htmlFor={cat.name}>{cat.name}</label>
+                <div
+                  key={cat.name}
+                  className="flex items-center gap-2 min-h-[24px]"
+                >
+                  <div className="w-4 h-4 flex-shrink-0">
+                    <input
+                      type="checkbox"
+                      id={cat.name}
+                      checked={category?.includes(cat.name)}
+                      onChange={() => toggleCategory(cat.name)}
+                      className="accent-red-600 w-4 h-4"
+                    />
+                  </div>
+                  <label htmlFor={cat.name} className="flex-1">
+                    {cat.name}
+                  </label>
                 </div>
               );
             })}
@@ -186,15 +196,22 @@ function SearchRecipes({ filters, totalRecipes }: SearchRecipesProps) {
           <div className="flex flex-col gap-2">
             {authors.map((auth) => {
               return (
-                <div key={auth.name} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id={auth.name}
-                    checked={author?.includes(auth.name)}
-                    onChange={() => toggleAuthor(auth.name)}
-                    className="accent-red-600 w-4 h-4"
-                  />
-                  <label htmlFor={auth.name}>{auth.name}</label>
+                <div
+                  key={auth.name}
+                  className="flex items-center gap-2 min-h-[24px]"
+                >
+                  <div className="w-4 h-4 flex-shrink-0">
+                    <input
+                      type="checkbox"
+                      id={auth.name}
+                      checked={author?.includes(auth.name)}
+                      onChange={() => toggleAuthor(auth.name)}
+                      className="accent-red-600 w-4 h-4"
+                    />
+                  </div>
+                  <label htmlFor={auth.name} className="flex-1">
+                    {auth.name}
+                  </label>
                 </div>
               );
             })}
@@ -215,15 +232,22 @@ function SearchRecipes({ filters, totalRecipes }: SearchRecipesProps) {
           <div className="flex flex-col gap-2">
             {courses.map((cour) => {
               return (
-                <div key={cour.name} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id={cour.name}
-                    checked={course?.includes(cour.name)}
-                    onChange={() => toggleCourse(cour.name)}
-                    className="accent-red-600 w-4 h-4"
-                  />
-                  <label htmlFor={cour.name}>{cour.name}</label>
+                <div
+                  key={cour.name}
+                  className="flex items-center gap-2 min-h-[24px]"
+                >
+                  <div className="w-4 h-4 flex-shrink-0">
+                    <input
+                      type="checkbox"
+                      id={cour.name}
+                      checked={course?.includes(cour.name)}
+                      onChange={() => toggleCourse(cour.name)}
+                      className="accent-red-600 w-4 h-4"
+                    />
+                  </div>
+                  <label htmlFor={cour.name} className="flex-1">
+                    {cour.name}
+                  </label>
                 </div>
               );
             })}
@@ -231,7 +255,7 @@ function SearchRecipes({ filters, totalRecipes }: SearchRecipesProps) {
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <div className="grid grid-cols-[1fr,auto] p-4 border border-slate-200 rounded-xl">
+        <div className="grid grid-cols-[1fr,auto] p-4 border border-slate-200 rounded-xl bg-neutral-50">
           <div className="grid grid-cols-[auto,1fr] items-center">
             <span className="text-sm text-neutral-600">Filtered by:</span>
             <div className="flex gap-2 items-center flex-wrap">
@@ -255,6 +279,19 @@ function SearchRecipes({ filters, totalRecipes }: SearchRecipesProps) {
                 <span className="font-semibold ml-2 bg-blue-700 px-4 py-2 text-neutral-50 rounded-full">
                   {" "}
                   Courses: {course.join(", ")}
+                </span>
+              )}
+              {sortBy && (
+                <span className="font-semibold ml-2 bg-yellow-600 px-4 py-2 text-neutral-50 rounded-full">
+                  {" "}
+                  Sort by:{" "}
+                  {sortBy
+                    .split(":")
+                    .join(" ")
+                    .replace("publishedAt", "Published")
+                    .replace("name", "Name")
+                    .replace("asc", "Ascending")
+                    .replace("desc", "Descending")}
                 </span>
               )}
             </div>

@@ -38,7 +38,7 @@ function SearchRecipesResult({
     if (data?.recipes?.length) {
       setRecipeSearch(data.recipes.length);
     }
-  }, [data?.recipes.length, setRecipeSearch]);
+  }, [data?.recipes?.length, setRecipeSearch]);
 
   if (isPending) {
     return <SkeletonRecipes />;

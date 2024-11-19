@@ -133,7 +133,25 @@ export type CategoryCoursesAuthorsQuery = CoursesQuery &
   AuthorsQuery &
   CategoriesQuery;
 
+// export type RecipeSearchQuery = {
+//   recipes: {
+//     documentId: string;
+//     name: string;
+//     image: {
+//       url: string;
+//     };
+//   }[];
+// };
+
 export type RecipeSearchQuery = {
+  recipes_connection: {
+    pageInfo: {
+      page: number;
+      pageCount: number;
+      pageSize: number;
+      total: number;
+    };
+  };
   recipes: {
     documentId: string;
     name: string;
@@ -144,7 +162,9 @@ export type RecipeSearchQuery = {
 };
 
 export type RecipesCountQuery = {
-  recipes: {
-    documentId: string;
-  }[];
+  recipes_connection: {
+    pageInfo: {
+      total: number;
+    };
+  };
 };

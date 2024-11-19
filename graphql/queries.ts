@@ -9,6 +9,7 @@ import {
   RecipesQuery,
   RelatedRecipesQuery,
 } from "./types";
+import { PAGE_SIZE } from "@/utils/constants";
 
 export async function getAuthors() {
   const query = `#graphql
@@ -204,18 +205,30 @@ export async function getSearchRecipes({
   nonNullCourses,
   nonNullName,
   nonNullSortBy,
+  page = 1,
+  pageSize = PAGE_SIZE,
 }: {
   nonNullAuthors: string[];
   nonNullCategories: string[];
   nonNullCourses: string[];
   nonNullName: string;
   nonNullSortBy: string;
+  page?: number;
+  pageSize?: number;
 }) {
   const query = `#graphql
-    query Query($filters: RecipeFiltersInput, $sort: [String]) {
-      recipes(filters: $filters, sort: $sort) {
-        name
+    query RecipeSearch($filters: RecipeFiltersInput, $sort: [String], $pagination: PaginationArg, $recipesConnectionPagination2: PaginationArg, $recipesConnectionFilters2: RecipeFiltersInput) {
+      recipes_connection(pagination: $recipesConnectionPagination2, filters: $recipesConnectionFilters2) {
+        pageInfo {
+          total
+          pageSize
+          pageCount
+          page
+        }
+      }
+      recipes(filters: $filters, sort: $sort, pagination: $pagination) {
         documentId
+        name
         image {
           url
         }
@@ -229,145 +242,130 @@ export async function getSearchRecipes({
     nonNullCategories.length > 0 ||
     nonNullCourses.length > 0;
 
-  // const data = await strapiGQLQuery<RecipeSearchQuery>({
-  //   query,
-  //   variables: {
-  //     filters:  {
-  //       or: [
-  //         {
-  //           author: {
-  //             name: {
-  //               in: nonNullAuthors,
-  //             },
-  //           },
-  //         },
-  //         {
-  //           categories: {
-  //             name: {
-  //               in: nonNullCategories,
-  //             },
-  //           },
-  //         },
-  //         {
-  //           courses: {
-  //             name: {
-  //               in: nonNullCourses,
-  //             },
-  //           },
-  //         },
-  //       ],
-  //     },
-  //   },
-  // });
+  const filtersV1 = {
+    and: [
+      // Name filter (if exists)
+      ...(nonNullName
+        ? [
+            {
+              name: {
+                contains: nonNullName,
+              },
+            },
+          ]
+        : []),
+      // Other filters in OR condition (if any exist)
+      ...(hasFilters
+        ? [
+            {
+              or: [
+                ...(nonNullAuthors.length > 0
+                  ? [
+                      {
+                        author: {
+                          name: {
+                            in: nonNullAuthors,
+                          },
+                        },
+                      },
+                    ]
+                  : []),
+                ...(nonNullCategories.length > 0
+                  ? [
+                      {
+                        categories: {
+                          name: {
+                            in: nonNullCategories,
+                          },
+                        },
+                      },
+                    ]
+                  : []),
+                ...(nonNullCourses.length > 0
+                  ? [
+                      {
+                        courses: {
+                          name: {
+                            in: nonNullCourses,
+                          },
+                        },
+                      },
+                    ]
+                  : []),
+              ],
+            },
+          ]
+        : []),
+    ],
+  };
 
-  // const data = await strapiGQLQuery<RecipeSearchQuery>({
-  //   query,
-  //   variables: {
-  //     filters: hasFilters
-  //       ? {
-  //           or: [
-  //             ...(nonNullAuthors.length > 0
-  //               ? [
-  //                   {
-  //                     author: {
-  //                       name: {
-  //                         in: nonNullAuthors,
-  //                       },
-  //                     },
-  //                   },
-  //                 ]
-  //               : []),
-  //             ...(nonNullCategories.length > 0
-  //               ? [
-  //                   {
-  //                     categories: {
-  //                       name: {
-  //                         in: nonNullCategories,
-  //                       },
-  //                     },
-  //                   },
-  //                 ]
-  //               : []),
-  //             ...(nonNullCourses.length > 0
-  //               ? [
-  //                   {
-  //                     courses: {
-  //                       name: {
-  //                         in: nonNullCourses,
-  //                       },
-  //                     },
-  //                   },
-  //                 ]
-  //               : []),
-  //           ],
-  //           name: {
-  //             contains: nonNullName,
-  //           },
-  //         }
-  //       : {},
-  //   },
-  // });
+  const filtersV2 = {
+    or: [
+      // Name filter (if exists)
+      ...(nonNullName
+        ? [
+            {
+              name: {
+                contains: nonNullName,
+              },
+            },
+          ]
+        : []),
+      // Author filters
+      ...(nonNullAuthors.length > 0
+        ? [
+            {
+              author: {
+                name: {
+                  in: nonNullAuthors,
+                },
+              },
+            },
+          ]
+        : []),
+      // Category filters
+      ...(nonNullCategories.length > 0
+        ? [
+            {
+              categories: {
+                name: {
+                  in: nonNullCategories,
+                },
+              },
+            },
+          ]
+        : []),
+      // Course filters
+      ...(nonNullCourses.length > 0
+        ? [
+            {
+              courses: {
+                name: {
+                  in: nonNullCourses,
+                },
+              },
+            },
+          ]
+        : []),
+    ],
+  };
+
+  console.log("filtersV1:", filtersV1);
 
   const data = await strapiGQLQuery<RecipeSearchQuery>({
     query,
     variables: {
-      filters: {
-        and: [
-          // Name filter (if exists)
-          ...(nonNullName
-            ? [
-                {
-                  name: {
-                    contains: nonNullName,
-                  },
-                },
-              ]
-            : []),
-          // Other filters in OR condition (if any exist)
-          ...(hasFilters
-            ? [
-                {
-                  or: [
-                    ...(nonNullAuthors.length > 0
-                      ? [
-                          {
-                            author: {
-                              name: {
-                                in: nonNullAuthors,
-                              },
-                            },
-                          },
-                        ]
-                      : []),
-                    ...(nonNullCategories.length > 0
-                      ? [
-                          {
-                            categories: {
-                              name: {
-                                in: nonNullCategories,
-                              },
-                            },
-                          },
-                        ]
-                      : []),
-                    ...(nonNullCourses.length > 0
-                      ? [
-                          {
-                            courses: {
-                              name: {
-                                in: nonNullCourses,
-                              },
-                            },
-                          },
-                        ]
-                      : []),
-                  ],
-                },
-              ]
-            : []),
-        ],
-      },
+      filters: filtersV1,
       sort: [nonNullSortBy],
+      pagination: {
+        page,
+        pageSize,
+      },
+      recipesConnectionPagination2: {
+        page,
+        pageSize,
+      },
+      recipesConnectionFilters2: filtersV1,
     },
   });
 
@@ -379,22 +377,31 @@ export async function getSearchRecipes({
 }
 
 export async function getRecipesCount() {
+  // const query = `#graphql
+  //   query RecipesCount {
+  //     recipes {
+  //       documentId
+  //     }
+  //   }
+  // `;
+
   const query = `#graphql
-    query RecipesCount {
-      recipes {
-        documentId
+    query RecipeSearch {
+      recipes_connection {
+        pageInfo {
+          total
+        }
       }
     }
   `;
 
   const data = await strapiGQLQuery<RecipesCountQuery>({
     query,
-    variables: {},
   });
 
   if (!data) {
     throw new Error("No data");
   }
 
-  return data.recipes.length;
+  return data.recipes_connection.pageInfo.total;
 }

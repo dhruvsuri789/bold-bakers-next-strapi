@@ -8,12 +8,14 @@ export async function getSearchData({
   course,
   name,
   sortBy,
+  page,
 }: {
   author: string[] | null;
   category: string[] | null;
   course: string[] | null;
   name: string | null;
   sortBy: string | null;
+  page: number;
 }) {
   const nonNullAuthors = author?.length ? author : [];
   const nonNullCategories = category?.length ? category : [];
@@ -27,6 +29,7 @@ export async function getSearchData({
     nonNullCourses,
     nonNullName,
     nonNullSortBy,
+    page,
   });
 
   if (!data) {

@@ -14,6 +14,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/app/_components/ui/pagination";
+
 import { useState } from "react";
 
 /* 
@@ -44,13 +55,20 @@ const debounceSearch = debounce(
 
 interface SearchRecipesProps {
   filters: CategoryCoursesAuthorsQuery;
-  totalRecipes: number;
 }
 
-function SearchRecipes({ filters, totalRecipes }: SearchRecipesProps) {
+function SearchRecipes({ filters }: SearchRecipesProps) {
   const { authors, categories, courses } = filters;
   const [inputValue, setInputValue] = useState("");
-  const [recipeSearch, setRecipeSearch] = useState(0);
+  const [recipeResults, setRecipeResults] = useState(0);
+  const [recipeResultsTotal, setRecipeResultsTotal] = useState(0);
+  const [page, setPage] = useQueryState("page", parseAsString);
+  const currentPage = page ? parseInt(page) : 1;
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage.toString());
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const [category, setCategory] = useQueryState(
     "category",
@@ -112,6 +130,7 @@ function SearchRecipes({ filters, totalRecipes }: SearchRecipesProps) {
     setCourse([]);
     setSortBy(null);
     setName(null);
+    setPage("1");
   }
 
   return (
@@ -133,10 +152,11 @@ function SearchRecipes({ filters, totalRecipes }: SearchRecipesProps) {
         </div>
         <div className="grid grid-cols-[1fr,auto] gap-2 pt-4">
           <p className="max-w-40">
-            Got <span className="font-bold text-red-600">{recipeSearch}</span>{" "}
+            Showing{" "}
+            <span className="font-bold text-red-600">{recipeResults}</span>{" "}
             results of{" "}
-            <span className="font-bold text-red-600">{totalRecipes}</span> total
-            recipes
+            <span className="font-bold text-red-600">{recipeResultsTotal}</span>{" "}
+            total recipes
           </p>
           <button
             className="underline text-red-600 hover:text-red-500 transition-colors"
@@ -254,7 +274,7 @@ function SearchRecipes({ filters, totalRecipes }: SearchRecipesProps) {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-6 mb-12">
         <div className="grid grid-cols-[1fr,auto] p-4 border border-slate-200 rounded-xl bg-neutral-50">
           <div className="grid grid-cols-[auto,1fr] items-center">
             <span className="text-sm text-neutral-600">Filtered by:</span>
@@ -322,8 +342,110 @@ function SearchRecipes({ filters, totalRecipes }: SearchRecipesProps) {
           course={course}
           sortBy={sortBy}
           name={name}
-          setRecipeSearch={setRecipeSearch}
+          page={currentPage}
+          setRecipeResults={setRecipeResults}
+          setRecipeResultsTotal={setRecipeResultsTotal}
         />
+        {recipeResultsTotal > 12 && (
+          <Pagination className="justify-center">
+            <PaginationContent className="list-none">
+              {currentPage > 1 && (
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    className="border border-red-600 text-red-600 hover:bg-red-600 hover:text-neutral-50 transition-colors"
+                    onClick={() =>
+                      currentPage > 1 && handlePageChange(currentPage - 1)
+                    }
+                  />
+                </PaginationItem>
+              )}
+
+              {(() => {
+                const totalPages = Math.ceil(recipeResultsTotal / 12);
+                const pages = [];
+
+                // Always show first page
+                pages.push(
+                  <PaginationItem key={1}>
+                    <PaginationLink
+                      href="#"
+                      isActive={currentPage === 1}
+                      onClick={() => handlePageChange(1)}
+                    >
+                      1
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+
+                // Add ellipsis and middle pages
+                if (totalPages > 1) {
+                  if (currentPage > 3) {
+                    pages.push(
+                      <PaginationItem key="ellipsis1">
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    );
+                  }
+
+                  // Show current page and surrounding pages
+                  for (
+                    let i = Math.max(2, currentPage - 1);
+                    i <= Math.min(totalPages - 1, currentPage + 1);
+                    i++
+                  ) {
+                    pages.push(
+                      <PaginationItem key={i}>
+                        <PaginationLink
+                          href="#"
+                          isActive={currentPage === i}
+                          onClick={() => handlePageChange(i)}
+                        >
+                          {i}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  }
+
+                  if (currentPage < totalPages - 2) {
+                    pages.push(
+                      <PaginationItem key="ellipsis2">
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    );
+                  }
+
+                  // Always show last page if there's more than one page
+                  if (totalPages > 1) {
+                    pages.push(
+                      <PaginationItem key={totalPages}>
+                        <PaginationLink
+                          href="#"
+                          isActive={currentPage === totalPages}
+                          onClick={() => handlePageChange(totalPages)}
+                        >
+                          {totalPages}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  }
+                }
+
+                return pages;
+              })()}
+
+              {currentPage < Math.ceil(recipeResultsTotal / 12) && (
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    className="border border-red-600 bg-red-600 text-neutral-50 hover:bg-neutral-50 hover:text-red-600 transition-colors"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                  />
+                </PaginationItem>
+              )}
+            </PaginationContent>
+          </Pagination>
+        )}
       </div>
     </div>
   );

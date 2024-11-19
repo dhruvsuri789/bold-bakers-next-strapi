@@ -1,14 +1,11 @@
-import { getFilters, getRecipesCount } from "@/graphql/queries";
+import { getFilters } from "@/graphql/queries";
 import SearchRecipes from "./SearchRecipes";
 import { Skeleton } from "./ui/skeleton";
 
 async function SearchRecipesParent() {
-  const [filters, totalRecipes] = await Promise.all([
-    getFilters(),
-    getRecipesCount(),
-  ]);
+  const filters = await getFilters();
 
-  return <SearchRecipes filters={filters} totalRecipes={totalRecipes} />;
+  return <SearchRecipes filters={filters} />;
 }
 
 function SkeletonSearchRecipesParent() {

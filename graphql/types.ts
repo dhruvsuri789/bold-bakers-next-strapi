@@ -145,6 +145,13 @@ export type CategoryCoursesAuthorsQuery = CoursesQuery &
 
 export type RecipeSearchQuery = {
   recipes_connection: {
+    nodes: {
+      documentId: string;
+      name: string;
+      image: {
+        url: string;
+      };
+    }[];
     pageInfo: {
       page: number;
       pageCount: number;
@@ -152,13 +159,6 @@ export type RecipeSearchQuery = {
       total: number;
     };
   };
-  recipes: {
-    documentId: string;
-    name: string;
-    image: {
-      url: string;
-    };
-  }[];
 };
 
 export type RecipesCountQuery = {

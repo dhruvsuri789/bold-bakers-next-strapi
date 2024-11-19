@@ -12,7 +12,7 @@ interface SearchRecipesResultProps {
   course: string[] | null;
   sortBy: string | null;
   name: string | null;
-  page: number;
+  page: number | null;
   setRecipeResults: (count: number) => void;
   setRecipeResultsTotal: (count: number) => void;
 }
@@ -30,6 +30,14 @@ function SearchRecipesResult({
   const { isPending, error, data } = useQuery({
     queryKey: ["recipesData", author, category, course, sortBy, name, page],
     queryFn: async () => {
+      console.log({
+        author,
+        category,
+        course,
+        sortBy,
+        name,
+        page,
+      });
       return await getSearchData({
         author,
         category,
@@ -42,16 +50,16 @@ function SearchRecipesResult({
   });
 
   useEffect(() => {
-    if (data?.recipes?.length) {
-      setRecipeResults(data?.recipes?.length);
+    if (data?.recipes_connection.nodes.length) {
+      setRecipeResults(data.recipes_connection.nodes.length);
     }
-  }, [data?.recipes?.length, setRecipeResults]);
+  }, [data?.recipes_connection.nodes.length, setRecipeResults]);
 
   useEffect(() => {
-    if (data?.recipes_connection?.pageInfo?.total) {
+    if (data?.recipes_connection.pageInfo.total) {
       setRecipeResultsTotal(data.recipes_connection.pageInfo.total);
     }
-  }, [data?.recipes_connection?.pageInfo?.total, setRecipeResultsTotal]);
+  }, [data?.recipes_connection.pageInfo.total, setRecipeResultsTotal]);
 
   if (isPending) {
     return <SkeletonRecipes />;
@@ -69,7 +77,7 @@ function SearchRecipesResult({
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-8 w-full">
-      {data?.recipes?.map((recipe) => {
+      {data?.recipes_connection.nodes.map((recipe) => {
         return <RecipeItem key={recipe.documentId} recipe={recipe} />;
       })}
     </div>

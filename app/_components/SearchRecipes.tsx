@@ -129,7 +129,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
     setAuthor([]);
     setCourse([]);
     setSortBy(null);
-    setName(null);
+    setName("");
     setPage("1");
   }
 
@@ -145,6 +145,9 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
             value={inputValue}
             onChange={(e) => {
               const value = e.target.value;
+              if (page && parseInt(page) > 1) {
+                handlePageChange(1);
+              }
               setInputValue(value);
               debounceSearch(value, setName);
             }}

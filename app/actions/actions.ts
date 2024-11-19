@@ -15,13 +15,14 @@ export async function getSearchData({
   course: string[] | null;
   name: string | null;
   sortBy: string | null;
-  page: number;
+  page: number | null;
 }) {
   const nonNullAuthors = author?.length ? author : [];
   const nonNullCategories = category?.length ? category : [];
   const nonNullCourses = course?.length ? course : [];
   const nonNullName = name || "";
   const nonNullSortBy = sortBy || "";
+  const nonNullPage = page || 1;
 
   const data = await getSearchRecipes({
     nonNullAuthors,
@@ -29,7 +30,7 @@ export async function getSearchData({
     nonNullCourses,
     nonNullName,
     nonNullSortBy,
-    page,
+    nonNullPage,
   });
 
   if (!data) {

@@ -205,7 +205,7 @@ export async function getSearchRecipes({
   nonNullCourses,
   nonNullName,
   nonNullSortBy,
-  page = 1,
+  nonNullPage: page = 1,
   pageSize = PAGE_SIZE,
 }: {
   nonNullAuthors: string[];
@@ -213,24 +213,24 @@ export async function getSearchRecipes({
   nonNullCourses: string[];
   nonNullName: string;
   nonNullSortBy: string;
-  page?: number;
+  nonNullPage?: number;
   pageSize?: number;
 }) {
   const query = `#graphql
-    query RecipeSearch($filters: RecipeFiltersInput, $sort: [String], $pagination: PaginationArg, $recipesConnectionPagination2: PaginationArg, $recipesConnectionFilters2: RecipeFiltersInput) {
-      recipes_connection(pagination: $recipesConnectionPagination2, filters: $recipesConnectionFilters2) {
+    query RecipeSearch($sort: [String], $pagination: PaginationArg, $filters: RecipeFiltersInput) {
+      recipes_connection(sort: $sort, pagination: $pagination, filters: $filters) {
+        nodes {
+          documentId
+          image {
+            url
+          }
+          name
+        }
         pageInfo {
           total
           pageSize
-          pageCount
           page
-        }
-      }
-      recipes(filters: $filters, sort: $sort, pagination: $pagination) {
-        documentId
-        name
-        image {
-          url
+          pageCount
         }
       }
     }
@@ -299,56 +299,56 @@ export async function getSearchRecipes({
     ],
   };
 
-  const filtersV2 = {
-    or: [
-      // Name filter (if exists)
-      ...(nonNullName
-        ? [
-            {
-              name: {
-                contains: nonNullName,
-              },
-            },
-          ]
-        : []),
-      // Author filters
-      ...(nonNullAuthors.length > 0
-        ? [
-            {
-              author: {
-                name: {
-                  in: nonNullAuthors,
-                },
-              },
-            },
-          ]
-        : []),
-      // Category filters
-      ...(nonNullCategories.length > 0
-        ? [
-            {
-              categories: {
-                name: {
-                  in: nonNullCategories,
-                },
-              },
-            },
-          ]
-        : []),
-      // Course filters
-      ...(nonNullCourses.length > 0
-        ? [
-            {
-              courses: {
-                name: {
-                  in: nonNullCourses,
-                },
-              },
-            },
-          ]
-        : []),
-    ],
-  };
+  // const filtersV2 = {
+  //   or: [
+  //     // Name filter (if exists)
+  //     ...(nonNullName
+  //       ? [
+  //           {
+  //             name: {
+  //               contains: nonNullName,
+  //             },
+  //           },
+  //         ]
+  //       : []),
+  //     // Author filters
+  //     ...(nonNullAuthors.length > 0
+  //       ? [
+  //           {
+  //             author: {
+  //               name: {
+  //                 in: nonNullAuthors,
+  //               },
+  //             },
+  //           },
+  //         ]
+  //       : []),
+  //     // Category filters
+  //     ...(nonNullCategories.length > 0
+  //       ? [
+  //           {
+  //             categories: {
+  //               name: {
+  //                 in: nonNullCategories,
+  //               },
+  //             },
+  //           },
+  //         ]
+  //       : []),
+  //     // Course filters
+  //     ...(nonNullCourses.length > 0
+  //       ? [
+  //           {
+  //             courses: {
+  //               name: {
+  //                 in: nonNullCourses,
+  //               },
+  //             },
+  //           },
+  //         ]
+  //       : []),
+  //   ],
+  // };
 
   console.log("filtersV1:", filtersV1);
 
@@ -361,11 +361,6 @@ export async function getSearchRecipes({
         page,
         pageSize,
       },
-      recipesConnectionPagination2: {
-        page,
-        pageSize,
-      },
-      recipesConnectionFilters2: filtersV1,
     },
   });
 

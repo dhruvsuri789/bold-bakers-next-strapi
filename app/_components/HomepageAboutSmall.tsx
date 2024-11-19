@@ -34,6 +34,7 @@ function HomepageAboutSmall({ section }: HomepageAboutSmallProps) {
             className="object-cover"
             src={`${BASE_URL}${url}`}
             alt={name}
+            sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 25vw"
           />
         </div>
       </div>

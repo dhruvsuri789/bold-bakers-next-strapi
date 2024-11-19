@@ -26,6 +26,7 @@ import {
 } from "@/app/_components/ui/pagination";
 
 import { useState } from "react";
+import { PAGE_SIZE } from "@/utils/constants";
 
 /* 
 {
@@ -353,7 +354,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
           setRecipeResults={setRecipeResults}
           setRecipeResultsTotal={setRecipeResultsTotal}
         />
-        {recipeResultsTotal > 12 && (
+        {recipeResultsTotal > PAGE_SIZE && (
           <Pagination className="justify-center">
             <PaginationContent className="list-none">
               {currentPage > 1 && (
@@ -369,7 +370,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
               )}
 
               {(() => {
-                const totalPages = Math.ceil(recipeResultsTotal / 12);
+                const totalPages = Math.ceil(recipeResultsTotal / PAGE_SIZE);
                 const pages = [];
 
                 // Always show first page
@@ -441,7 +442,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
                 return pages;
               })()}
 
-              {currentPage < Math.ceil(recipeResultsTotal / 12) && (
+              {currentPage < Math.ceil(recipeResultsTotal / PAGE_SIZE) && (
                 <PaginationItem>
                   <PaginationNext
                     href="#"

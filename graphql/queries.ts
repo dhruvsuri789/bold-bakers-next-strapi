@@ -200,20 +200,20 @@ export async function getFilters() {
 }
 
 export async function getSearchRecipes({
-  nonNullAuthors,
-  nonNullCategories,
-  nonNullCourses,
-  nonNullName,
-  nonNullSortBy,
-  nonNullPage: page = 1,
+  author,
+  category,
+  course,
+  name,
+  sortBy,
+  page = 1,
   pageSize = PAGE_SIZE,
 }: {
-  nonNullAuthors: string[];
-  nonNullCategories: string[];
-  nonNullCourses: string[];
-  nonNullName: string;
-  nonNullSortBy: string;
-  nonNullPage?: number;
+  author: string[];
+  category: string[];
+  course: string[];
+  name: string;
+  sortBy: string;
+  page: number;
   pageSize?: number;
 }) {
   const query = `#graphql
@@ -238,66 +238,103 @@ export async function getSearchRecipes({
 
   // Only add filters if any arrays have values
   const hasFilters =
-    nonNullAuthors.length > 0 ||
-    nonNullCategories.length > 0 ||
-    nonNullCourses.length > 0;
+    author.length > 0 || category.length > 0 || course.length > 0;
 
   const filtersV1 = {
     and: [
-      // Name filter (if exists)
-      ...(nonNullName
-        ? [
-            {
-              name: {
-                contains: nonNullName,
-              },
-            },
-          ]
-        : []),
+      {
+        name: {
+          contains: name,
+        },
+      },
       // Other filters in OR condition (if any exist)
       ...(hasFilters
         ? [
             {
               or: [
-                ...(nonNullAuthors.length > 0
-                  ? [
-                      {
-                        author: {
-                          name: {
-                            in: nonNullAuthors,
-                          },
-                        },
-                      },
-                    ]
-                  : []),
-                ...(nonNullCategories.length > 0
-                  ? [
-                      {
-                        categories: {
-                          name: {
-                            in: nonNullCategories,
-                          },
-                        },
-                      },
-                    ]
-                  : []),
-                ...(nonNullCourses.length > 0
-                  ? [
-                      {
-                        courses: {
-                          name: {
-                            in: nonNullCourses,
-                          },
-                        },
-                      },
-                    ]
-                  : []),
+                {
+                  author: {
+                    name: {
+                      in: author,
+                    },
+                  },
+                },
+                {
+                  categories: {
+                    name: {
+                      in: category,
+                    },
+                  },
+                },
+                {
+                  courses: {
+                    name: {
+                      in: course,
+                    },
+                  },
+                },
               ],
             },
           ]
         : []),
     ],
   };
+  // const filtersV3 = {
+  //   and: [
+  //     // Name filter (if exists)
+  //     ...(name
+  //       ? [
+  //           {
+  //             name: {
+  //               contains: name,
+  //             },
+  //           },
+  //         ]
+  //       : []),
+  //     // Other filters in OR condition (if any exist)
+  //     ...(hasFilters
+  //       ? [
+  //           {
+  //             or: [
+  //               ...(author.length > 0
+  //                 ? [
+  //                     {
+  //                       author: {
+  //                         name: {
+  //                           in: author,
+  //                         },
+  //                       },
+  //                     },
+  //                   ]
+  //                 : []),
+  //               ...(category.length > 0
+  //                 ? [
+  //                     {
+  //                       categories: {
+  //                         name: {
+  //                           in: category,
+  //                         },
+  //                       },
+  //                     },
+  //                   ]
+  //                 : []),
+  //               ...(course.length > 0
+  //                 ? [
+  //                     {
+  //                       courses: {
+  //                         name: {
+  //                           in: course,
+  //                         },
+  //                       },
+  //                     },
+  //                   ]
+  //                 : []),
+  //             ],
+  //           },
+  //         ]
+  //       : []),
+  //   ],
+  // };
 
   // const filtersV2 = {
   //   or: [
@@ -356,7 +393,7 @@ export async function getSearchRecipes({
     query,
     variables: {
       filters: filtersV1,
-      sort: [nonNullSortBy],
+      sort: [sortBy],
       pagination: {
         page,
         pageSize,

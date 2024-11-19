@@ -5,7 +5,13 @@ function Nav() {
   return (
     <nav className="py-6 flex justify-between items-center">
       <Link href="/">
-        <Image src="/logo.png" alt="logo" width={150} height={100} />
+        <Image
+          src="/logo.png"
+          alt="logo"
+          width={150}
+          height={100}
+          style={{ width: "auto" }}
+        />
       </Link>
       <ul className="flex gap-12 list-none">
         <li>

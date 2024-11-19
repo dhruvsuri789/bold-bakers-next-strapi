@@ -19,9 +19,10 @@ function HomepageFeatured({ section }: HomepageFeaturedProps) {
               src={`${BASE_URL}${image.url}`}
               alt={image.name}
               key={image.name}
-              width={80}
-              height={20}
+              width={160}
+              height={40}
               // className="grayscale"
+              style={{ maxWidth: "80px" }}
             />
           );
         })}

@@ -9,12 +9,12 @@ import { useEffect } from "react";
 // These now can be set without null options
 // But I am leaving them in for now
 interface SearchRecipesResultProps {
-  category: string[] | null;
-  author: string[] | null;
-  course: string[] | null;
-  sortBy: string | null;
-  name: string | null;
-  page: number | null;
+  category: string[];
+  author: string[];
+  course: string[];
+  sortBy: string;
+  name: string;
+  page: number;
   setRecipeResults: (count: number) => void;
   setRecipeResultsTotal: (count: number) => void;
 }
@@ -49,6 +49,7 @@ function SearchRecipesResult({
         page,
       });
     },
+    throwOnError: true,
   });
 
   useEffect(() => {

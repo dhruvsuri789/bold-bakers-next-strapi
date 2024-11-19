@@ -132,7 +132,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
     setCategory([]);
     setAuthor([]);
     setCourse([]);
-    setSortBy(null);
+    setSortBy("");
     setInputValue("");
     setName("");
     setPage("");

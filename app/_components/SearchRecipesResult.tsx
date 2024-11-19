@@ -4,10 +4,8 @@ import { getSearchData } from "@/app/actions/actions";
 import { useQuery } from "@tanstack/react-query";
 import RecipeItem from "./RecipeItem";
 import { Skeleton } from "./ui/skeleton";
-import { useEffect } from "react";
+import { memo, useEffect } from "react";
 
-// These now can be set without null options
-// But I am leaving them in for now
 interface SearchRecipesResultProps {
   category: string[];
   author: string[];
@@ -53,29 +51,25 @@ function SearchRecipesResult({
   });
 
   useEffect(() => {
-    if (data?.recipes_connection.nodes.length) {
+    if (data?.recipes_connection) {
       setRecipeResults(data.recipes_connection.nodes.length);
-    }
-  }, [data?.recipes_connection.nodes.length, setRecipeResults]);
-
-  useEffect(() => {
-    if (data?.recipes_connection.pageInfo.total) {
       setRecipeResultsTotal(data.recipes_connection.pageInfo.total);
     }
-  }, [data?.recipes_connection.pageInfo.total, setRecipeResultsTotal]);
+  }, [data?.recipes_connection, setRecipeResults, setRecipeResultsTotal]);
 
   if (isPending) {
+    console.log("isPending");
     return <SkeletonRecipes />;
   }
 
   // TODO Add Error page for recipes
   if (error) {
-    return null;
+    return <p>{error.message}</p>;
   }
 
   // TODO Add Empty page for recipes
   if (!data) {
-    return null;
+    return <p>Empty page</p>;
   }
 
   return (
@@ -110,4 +104,4 @@ function SkeletonRecipes() {
 
 SearchRecipesResult.Skeleton = SkeletonRecipes;
 
-export default SearchRecipesResult;
+export default memo(SearchRecipesResult);

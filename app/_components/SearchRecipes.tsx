@@ -62,7 +62,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
   const [inputValue, setInputValue] = useState("");
   const [recipeResults, setRecipeResults] = useState(0);
   const [recipeResultsTotal, setRecipeResultsTotal] = useState(0);
-  const [page, setPage] = useQueryState("page", parseAsString);
+  const [page, setPage] = useQueryState("page", parseAsString.withDefault(""));
   const currentPage = page ? parseInt(page) : 1;
 
   const handlePageChange = (newPage: number) => {
@@ -72,21 +72,24 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
 
   const [category, setCategory] = useQueryState(
     "category",
-    parseAsArrayOf<string>(parseAsString)
+    parseAsArrayOf<string>(parseAsString).withDefault([])
   );
 
   const [author, setAuthor] = useQueryState(
     "author",
-    parseAsArrayOf<string>(parseAsString)
+    parseAsArrayOf<string>(parseAsString).withDefault([])
   );
 
   const [course, setCourse] = useQueryState(
     "course",
-    parseAsArrayOf<string>(parseAsString)
+    parseAsArrayOf<string>(parseAsString).withDefault([])
   );
 
-  const [sortBy, setSortBy] = useQueryState("sortby");
-  const [name, setName] = useQueryState("name");
+  const [sortBy, setSortBy] = useQueryState(
+    "sortby",
+    parseAsString.withDefault("")
+  );
+  const [name, setName] = useQueryState("name", parseAsString.withDefault(""));
 
   // Function to toggle categories
   const toggleCategory = (value: string) => {
@@ -129,8 +132,8 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
     setAuthor([]);
     setCourse([]);
     setSortBy(null);
-    setName("");
-    setPage("1");
+    setInputValue("");
+    setPage("");
   }
 
   return (
@@ -142,7 +145,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
             type="search"
             placeholder="Search recipes (min. 3 char)"
             className="w-full h-12 rounded-lg"
-            value={inputValue}
+            value={inputValue || ""}
             onChange={(e) => {
               const value = e.target.value;
               if (page && parseInt(page) > 1) {

@@ -133,6 +133,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
     setCourse([]);
     setSortBy(null);
     setInputValue("");
+    setName("");
     setPage("");
   }
 

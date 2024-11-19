@@ -6,6 +6,8 @@ import RecipeItem from "./RecipeItem";
 import { Skeleton } from "./ui/skeleton";
 import { useEffect } from "react";
 
+// These now can be set without null options
+// But I am leaving them in for now
 interface SearchRecipesResultProps {
   category: string[] | null;
   author: string[] | null;

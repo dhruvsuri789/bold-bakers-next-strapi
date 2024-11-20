@@ -236,49 +236,67 @@ export async function getSearchRecipes({
     }
   `;
 
+  console.log("Server-Only:", {
+    author,
+    category,
+    course,
+    name,
+    sortBy,
+    page,
+    pageSize,
+  });
+
   // Only add filters if any arrays have values
   const hasFilters =
     author.length > 0 || category.length > 0 || course.length > 0;
 
-  const filtersV1 = {
-    and: [
-      {
-        name: {
-          contains: name,
-        },
-      },
-      // Other filters in OR condition (if any exist)
-      ...(hasFilters
-        ? [
-            {
-              or: [
-                {
-                  author: {
+  const filtersV1 =
+    name !== "" || hasFilters
+      ? {
+          and: [
+            //Name filter (if exists)
+            ...(name
+              ? [
+                  {
                     name: {
-                      in: author,
+                      contains: name,
                     },
                   },
-                },
-                {
-                  categories: {
-                    name: {
-                      in: category,
-                    },
+                ]
+              : []),
+            // Other filters in OR condition (if any exist)
+            ...(hasFilters
+              ? [
+                  {
+                    or: [
+                      {
+                        author: {
+                          name: {
+                            in: author,
+                          },
+                        },
+                      },
+                      {
+                        categories: {
+                          name: {
+                            in: category,
+                          },
+                        },
+                      },
+                      {
+                        courses: {
+                          name: {
+                            in: course,
+                          },
+                        },
+                      },
+                    ],
                   },
-                },
-                {
-                  courses: {
-                    name: {
-                      in: course,
-                    },
-                  },
-                },
-              ],
-            },
-          ]
-        : []),
-    ],
-  };
+                ]
+              : []),
+          ],
+        }
+      : undefined;
   // const filtersV3 = {
   //   and: [
   //     // Name filter (if exists)
@@ -393,9 +411,9 @@ export async function getSearchRecipes({
     query,
     variables: {
       filters: filtersV1,
-      sort: [sortBy],
+      sort: sortBy ? [sortBy] : undefined,
       pagination: {
-        page,
+        page: Math.max(1, page), // Ensure page is never less than 1,
         pageSize,
       },
     },

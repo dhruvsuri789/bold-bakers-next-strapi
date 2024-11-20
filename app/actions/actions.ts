@@ -17,6 +17,15 @@ export async function getSearchData({
   sortBy: string;
   page: number;
 }) {
+  console.log("Server Action:", {
+    author,
+    category,
+    course,
+    name,
+    sortBy,
+    page,
+  });
+
   const data = await getSearchRecipes({
     author,
     category,

@@ -32,7 +32,7 @@ function SearchRecipesResult({
   const { isPending, error, data } = useQuery({
     queryKey: ["recipesData", author, category, course, sortBy, name, page],
     queryFn: async () => {
-      console.log({
+      console.log("UseQuery", {
         author,
         category,
         course,
@@ -49,7 +49,9 @@ function SearchRecipesResult({
         page,
       });
     },
-    throwOnError: true,
+    throwOnError: false,
+    refetchOnWindowFocus: false,
+    staleTime: 0,
   });
 
   useEffect(() => {
@@ -70,12 +72,27 @@ function SearchRecipesResult({
 
   // TODO Add Error page for recipes
   if (error) {
-    return null;
+    console.error("Search error:", error);
+    return (
+      <div className="flex flex-col items-center justify-center p-8 text-center">
+        <p className="text-red-600 font-semibold">Error loading recipes</p>
+        <p className="text-sm text-gray-600">
+          Please try again or adjust your search criteria
+        </p>
+      </div>
+    );
   }
 
   // TODO Add Empty page for recipes
-  if (!data) {
-    return null;
+  if (!data || !data.recipes_connection.nodes.length) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 text-center">
+        <p className="font-semibold">No recipes found</p>
+        <p className="text-sm text-gray-600">
+          Try adjusting your search criteria
+        </p>
+      </div>
+    );
   }
 
   return (

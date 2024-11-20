@@ -29,6 +29,14 @@ function SearchRecipesResult({
   setRecipeResults,
   setRecipeResultsTotal,
 }: SearchRecipesResultProps) {
+  console.log("SearchRecipesResult", {
+    author,
+    category,
+    course,
+    sortBy,
+    name,
+    page,
+  });
   const { isPending, error, data } = useQuery({
     queryKey: ["recipesData", author, category, course, sortBy, name, page],
     queryFn: async () => {
@@ -40,7 +48,7 @@ function SearchRecipesResult({
         name,
         page,
       });
-      return await getSearchData({
+      const data = await getSearchData({
         author,
         category,
         course,
@@ -48,10 +56,12 @@ function SearchRecipesResult({
         sortBy,
         page,
       });
+      console.log("UseQueryData", data);
+      return data;
     },
     throwOnError: false,
-    refetchOnWindowFocus: false,
     staleTime: 0,
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
@@ -75,7 +85,9 @@ function SearchRecipesResult({
     console.error("Search error:", error);
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
-        <p className="text-red-600 font-semibold">Error loading recipes</p>
+        <p className="text-red-600 font-semibold text-xl">
+          Error loading recipes
+        </p>
         <p className="text-sm text-gray-600">
           Please try again or adjust your search criteria
         </p>
@@ -87,7 +99,7 @@ function SearchRecipesResult({
   if (!data || !data.recipes_connection.nodes.length) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
-        <p className="font-semibold">No recipes found</p>
+        <p className="font-semibold text-xl">No recipes found</p>
         <p className="text-sm text-gray-600">
           Try adjusting your search criteria
         </p>

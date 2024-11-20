@@ -417,6 +417,8 @@ export async function getSearchRecipes({
         pageSize,
       },
     },
+    revalidate: 0,
+    tags: ["recipesData"],
   });
 
   if (!data) {

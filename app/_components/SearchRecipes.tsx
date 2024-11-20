@@ -27,6 +27,7 @@ import {
 
 import { useState } from "react";
 import { PAGE_SIZE } from "@/utils/constants";
+import { useRouter } from "next/navigation";
 
 /* 
 {
@@ -60,15 +61,18 @@ interface SearchRecipesProps {
 
 function SearchRecipes({ filters }: SearchRecipesProps) {
   const { authors, categories, courses } = filters;
+  const router = useRouter();
   const [inputValue, setInputValue] = useState("");
   const [recipeResults, setRecipeResults] = useState(0);
   const [recipeResultsTotal, setRecipeResultsTotal] = useState(0);
   const [page, setPage] = useQueryState("page", parseAsString.withDefault(""));
   const currentPage = page ? parseInt(page) : 1;
+  console.log("currentPage: ", currentPage);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage.toString());
     window.scrollTo({ top: 0, behavior: "smooth" });
+    router.refresh();
   };
 
   const [category, setCategory] = useQueryState(

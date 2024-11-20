@@ -1,6 +1,7 @@
 "use server";
 
 import { getSearchRecipes } from "@/graphql/queries";
+import { revalidateTag } from "next/cache";
 
 export async function getSearchData({
   author,
@@ -38,6 +39,8 @@ export async function getSearchData({
   if (!data) {
     throw new Error("No data");
   }
+
+  revalidateTag("recipesData");
 
   return data;
 }

@@ -25,9 +25,9 @@ import {
   PaginationPrevious,
 } from "@/app/_components/ui/pagination";
 
-import { useState } from "react";
 import { PAGE_SIZE } from "@/utils/constants";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 /* 
 {
@@ -67,7 +67,6 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
   const [recipeResultsTotal, setRecipeResultsTotal] = useState(0);
   const [page, setPage] = useQueryState("page", parseAsString.withDefault(""));
   const currentPage = page ? parseInt(page) : 1;
-  console.log("currentPage: ", currentPage);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage.toString());
@@ -184,6 +183,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
               className="underline text-neutral-600 hover:text-red-500 transition-colors"
               onClick={() => {
                 setCategory([]);
+                setPage("");
               }}
             >
               Clear
@@ -201,7 +201,10 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
                       type="checkbox"
                       id={cat.name}
                       checked={category?.includes(cat.name)}
-                      onChange={() => toggleCategory(cat.name)}
+                      onChange={() => {
+                        setPage("1");
+                        toggleCategory(cat.name);
+                      }}
                       className="accent-red-600 w-4 h-4"
                     />
                   </div>
@@ -220,6 +223,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
               className="underline text-neutral-600 hover:text-red-500 transition-colors"
               onClick={() => {
                 setAuthor([]);
+                setPage("");
               }}
             >
               Clear
@@ -237,7 +241,10 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
                       type="checkbox"
                       id={auth.name}
                       checked={author?.includes(auth.name)}
-                      onChange={() => toggleAuthor(auth.name)}
+                      onChange={() => {
+                        setPage("1");
+                        toggleAuthor(auth.name);
+                      }}
                       className="accent-red-600 w-4 h-4"
                     />
                   </div>
@@ -256,6 +263,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
               className="underline text-neutral-600 hover:text-red-500 transition-colors"
               onClick={() => {
                 setCourse([]);
+                setPage("");
               }}
             >
               Clear
@@ -273,7 +281,10 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
                       type="checkbox"
                       id={cour.name}
                       checked={course?.includes(cour.name)}
-                      onChange={() => toggleCourse(cour.name)}
+                      onChange={() => {
+                        setPage("1");
+                        toggleCourse(cour.name);
+                      }}
                       className="accent-red-600 w-4 h-4"
                     />
                   </div>
@@ -329,7 +340,10 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
             </div>
           </div>
           <Select
-            onValueChange={(value) => setSortBy(value)}
+            onValueChange={(value) => {
+              setPage("1");
+              setSortBy(value);
+            }}
             value={sortBy || ""}
           >
             <SelectTrigger className="w-[150px]">
@@ -361,17 +375,20 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
         {recipeResultsTotal > PAGE_SIZE && (
           <Pagination className="justify-center">
             <PaginationContent className="list-none">
-              {currentPage > 1 && (
-                <PaginationItem>
-                  <PaginationPrevious
-                    href="#"
-                    className="border border-red-600 text-red-600 hover:bg-red-600 hover:text-neutral-50 transition-colors"
-                    onClick={() =>
-                      currentPage > 1 && handlePageChange(currentPage - 1)
-                    }
-                  />
-                </PaginationItem>
-              )}
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  className={`border border-red-600 text-red-600 transition-colors ${
+                    currentPage > 1
+                      ? "hover:bg-red-600 hover:text-neutral-50"
+                      : "opacity-50 cursor-not-allowed"
+                  }`}
+                  onClick={() =>
+                    currentPage > 1 && handlePageChange(currentPage - 1)
+                  }
+                  disabled={currentPage <= 1}
+                />
+              </PaginationItem>
 
               {(() => {
                 const totalPages = Math.ceil(recipeResultsTotal / PAGE_SIZE);
@@ -384,13 +401,14 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
                       href="#"
                       isActive={currentPage === 1}
                       onClick={() => handlePageChange(1)}
+                      disabled={totalPages < 1}
                     >
                       1
                     </PaginationLink>
                   </PaginationItem>
                 );
 
-                // Add ellipsis and middle pages
+                // Show ellipsis and some middle pages
                 if (totalPages > 1) {
                   if (currentPage > 3) {
                     pages.push(
@@ -427,7 +445,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
                     );
                   }
 
-                  // Always show last page if there's more than one page
+                  // Always show last page if there is more than one page
                   if (totalPages > 1) {
                     pages.push(
                       <PaginationItem key={totalPages}>
@@ -446,15 +464,23 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
                 return pages;
               })()}
 
-              {currentPage < Math.ceil(recipeResultsTotal / PAGE_SIZE) && (
-                <PaginationItem>
-                  <PaginationNext
-                    href="#"
-                    className="border border-red-600 bg-red-600 text-neutral-50 hover:bg-neutral-50 hover:text-red-600 transition-colors"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                  />
-                </PaginationItem>
-              )}
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  className={`border border-red-600 text-red-600 transition-colors ${
+                    currentPage < Math.ceil(recipeResultsTotal / PAGE_SIZE)
+                      ? "hover:bg-red-600 hover:text-neutral-50"
+                      : "opacity-50 cursor-not-allowed"
+                  }`}
+                  onClick={() =>
+                    currentPage < Math.ceil(recipeResultsTotal / PAGE_SIZE) &&
+                    handlePageChange(currentPage + 1)
+                  }
+                  disabled={
+                    currentPage >= Math.ceil(recipeResultsTotal / PAGE_SIZE)
+                  }
+                />
+              </PaginationItem>
             </PaginationContent>
           </Pagination>
         )}

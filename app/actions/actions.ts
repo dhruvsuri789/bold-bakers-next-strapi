@@ -1,7 +1,6 @@
 "use server";
 
 import { getSearchRecipes } from "@/graphql/queries";
-import { revalidateTag } from "next/cache";
 
 export async function getSearchData({
   author,
@@ -18,15 +17,6 @@ export async function getSearchData({
   sortBy: string;
   page: number;
 }) {
-  console.log("Server Action:", {
-    author,
-    category,
-    course,
-    name,
-    sortBy,
-    page,
-  });
-
   const data = await getSearchRecipes({
     author,
     category,
@@ -40,7 +30,5 @@ export async function getSearchData({
     throw new Error("No data");
   }
 
-  revalidateTag("recipesData");
-
-  return data;
+  return { data };
 }

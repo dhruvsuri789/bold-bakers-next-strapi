@@ -1,10 +1,11 @@
 "use client";
 
-import { getSearchData } from "@/app/actions/actions";
+import { RecipeSearchQuery } from "@/graphql/types";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import RecipeItem from "./RecipeItem";
 import { Skeleton } from "./ui/skeleton";
-import { useEffect } from "react";
+import { PAGE_SIZE } from "@/utils/constants";
 
 // These now can be set without null options
 // But I am leaving them in for now
@@ -29,40 +30,22 @@ function SearchRecipesResult({
   setRecipeResults,
   setRecipeResultsTotal,
 }: SearchRecipesResultProps) {
-  console.log("SearchRecipesResult", {
-    author,
-    category,
-    course,
-    sortBy,
-    name,
-    page,
-  });
-  const { isPending, error, data } = useQuery({
-    queryKey: ["recipesData", author, category, course, sortBy, name, page],
+  const { status, fetchStatus, error, data } = useQuery({
+    queryKey: ["recipesData", { author, category, course, sortBy, name, page }],
     queryFn: async () => {
-      console.log("UseQuery", {
-        author,
-        category,
-        course,
-        sortBy,
-        name,
-        page,
-      });
-      const data = await getSearchData({
-        author,
-        category,
-        course,
-        name,
-        sortBy,
-        page,
-      });
-      console.log("UseQueryData", data);
-      return data;
+      const { data } = await fetch("/api/recipes", {
+        method: "POST",
+        body: JSON.stringify({ author, category, course, sortBy, name, page }),
+      }).then((res) => res.json());
+      return data as RecipeSearchQuery;
     },
-    throwOnError: false,
-    staleTime: 0,
-    refetchOnWindowFocus: false,
+    gcTime: 5000,
   });
+
+  function handleReset() {
+    setRecipeResults(0);
+    setRecipeResultsTotal(0);
+  }
 
   useEffect(() => {
     if (data?.recipes_connection.nodes.length) {
@@ -76,12 +59,15 @@ function SearchRecipesResult({
     }
   }, [data?.recipes_connection.pageInfo.total, setRecipeResultsTotal]);
 
-  if (isPending) {
-    return <SkeletonRecipes />;
+  if (status === "pending") {
+    if (fetchStatus === "fetching") {
+      return <SkeletonRecipes />;
+    }
   }
 
   // TODO Add Error page for recipes
   if (error) {
+    handleReset();
     console.error("Search error:", error);
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
@@ -97,6 +83,7 @@ function SearchRecipesResult({
 
   // TODO Add Empty page for recipes
   if (!data || !data.recipes_connection.nodes.length) {
+    handleReset();
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
         <p className="font-semibold text-xl">No recipes found</p>
@@ -107,13 +94,15 @@ function SearchRecipesResult({
     );
   }
 
-  return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-8 w-full">
-      {data?.recipes_connection.nodes.map((recipe) => {
-        return <RecipeItem key={recipe.documentId} recipe={recipe} />;
-      })}
-    </div>
-  );
+  if (status === "success") {
+    return (
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-8 w-full">
+        {data.recipes_connection.nodes.map((recipe) => {
+          return <RecipeItem key={recipe.documentId} recipe={recipe} />;
+        })}
+      </div>
+    );
+  }
 }
 
 function InnerSkeleton() {
@@ -130,7 +119,7 @@ function InnerSkeleton() {
 function SkeletonRecipes() {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12 w-full">
-      {[...Array(12)].map((_, index) => {
+      {[...Array(PAGE_SIZE)].map((_, index) => {
         return <InnerSkeleton key={index} />;
       })}
     </div>

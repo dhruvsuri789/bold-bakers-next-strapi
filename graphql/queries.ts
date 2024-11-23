@@ -236,16 +236,6 @@ export async function getSearchRecipes({
     }
   `;
 
-  console.log("Server-Only:", {
-    author,
-    category,
-    course,
-    name,
-    sortBy,
-    page,
-    pageSize,
-  });
-
   // Only add filters if any arrays have values
   const hasFilters =
     author.length > 0 || category.length > 0 || course.length > 0;
@@ -404,8 +394,6 @@ export async function getSearchRecipes({
   //       : []),
   //   ],
   // };
-
-  console.log("filtersV1:", filtersV1);
 
   const data = await strapiGQLQuery<RecipeSearchQuery>({
     query,

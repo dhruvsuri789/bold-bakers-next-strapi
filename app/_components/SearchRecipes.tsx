@@ -26,7 +26,7 @@ import {
 } from "@/app/_components/ui/pagination";
 
 import { PAGE_SIZE } from "@/utils/constants";
-import { useRouter } from "next/navigation";
+import { X } from "lucide-react";
 import { useState } from "react";
 
 /* 
@@ -61,7 +61,6 @@ interface SearchRecipesProps {
 
 function SearchRecipes({ filters }: SearchRecipesProps) {
   const { authors, categories, courses } = filters;
-  const router = useRouter();
   const [inputValue, setInputValue] = useState("");
   const [recipeResults, setRecipeResults] = useState(0);
   const [recipeResultsTotal, setRecipeResultsTotal] = useState(0);
@@ -71,7 +70,6 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
   const handlePageChange = (newPage: number) => {
     setPage(newPage.toString());
     window.scrollTo({ top: 0, behavior: "smooth" });
-    router.refresh();
   };
 
   const [category, setCategory] = useQueryState(
@@ -297,45 +295,83 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-6 mb-12">
-        <div className="grid grid-cols-[1fr,auto] p-4 border border-slate-200 rounded-xl bg-neutral-50">
+      <div className="grid grid-rows-[auto,1fr,auto] gap-6 mb-12">
+        <div className="grid grid-cols-[1fr,auto] gap-6 p-4 border border-slate-200 rounded-xl bg-neutral-50">
           <div className="grid grid-cols-[auto,1fr] items-center">
             <span className="text-sm text-neutral-600">Filtered by:</span>
             <div className="flex gap-2 items-center flex-wrap">
               {name && (
-                <span className="font-semibold ml-2 bg-violet-600 px-4 py-2 text-neutral-50 rounded-full">
-                  Name: {name}
-                </span>
+                <button
+                  className="font-semibold ml-2 bg-violet-600 px-4 py-2 text-neutral-50 rounded-full hover:bg-violet-500 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-2"
+                  onClick={() => {
+                    setName("");
+                    setPage("");
+                    setInputValue("");
+                  }}
+                >
+                  <span>Name: {name}</span>
+                  <X className="w-4 h-4" />
+                </button>
               )}
               {category && category.length > 0 && (
-                <span className="font-semibold ml-2 bg-red-500 px-4 py-2 text-neutral-50 rounded-full">
-                  Categories: {category.join(", ")}
-                </span>
+                <button
+                  className="font-semibold ml-2 bg-red-500 px-4 py-2 text-neutral-50 rounded-full hover:bg-red-400 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-2"
+                  onClick={() => {
+                    setCategory([]);
+                    setPage("");
+                  }}
+                >
+                  <span>Categories: {category.join(", ")}</span>
+                  <X className="w-4 h-4" />
+                </button>
               )}
+
               {author && author.length > 0 && (
-                <span className="font-semibold ml-2 bg-green-700 px-4 py-2 text-neutral-50 rounded-full">
-                  {" "}
-                  Authors: {author.join(", ")}
-                </span>
+                <button
+                  className="font-semibold ml-2 bg-green-700 px-4 py-2 text-neutral-50 rounded-full hover:bg-green-600 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-2"
+                  onClick={() => {
+                    setAuthor([]);
+                    setPage("");
+                  }}
+                >
+                  <span>Authors: {author.join(", ")}</span>
+                  <X className="w-4 h-4" />
+                </button>
               )}
+
               {course && course.length > 0 && (
-                <span className="font-semibold ml-2 bg-blue-700 px-4 py-2 text-neutral-50 rounded-full">
-                  {" "}
-                  Courses: {course.join(", ")}
-                </span>
+                <button
+                  className="font-semibold ml-2 bg-blue-700 px-4 py-2 text-neutral-50 rounded-full hover:bg-blue-600 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-2"
+                  onClick={() => {
+                    setCourse([]);
+                    setPage("");
+                  }}
+                >
+                  <span>Courses: {course.join(", ")}</span>
+                  <X className="w-4 h-4" />
+                </button>
               )}
+
               {sortBy && (
-                <span className="font-semibold ml-2 bg-yellow-600 px-4 py-2 text-neutral-50 rounded-full">
-                  {" "}
-                  Sort by:{" "}
-                  {sortBy
-                    .split(":")
-                    .join(" ")
-                    .replace("publishedAt", "Published")
-                    .replace("name", "Name")
-                    .replace("asc", "Ascending")
-                    .replace("desc", "Descending")}
-                </span>
+                <button
+                  className="font-semibold ml-2 bg-yellow-600 px-4 py-2 text-neutral-50 rounded-full hover:bg-yellow-500 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-2"
+                  onClick={() => {
+                    setSortBy("");
+                    setPage("");
+                  }}
+                >
+                  <span>
+                    Sort by:{" "}
+                    {sortBy
+                      .split(":")
+                      .join(" ")
+                      .replace("publishedAt", "Published")
+                      .replace("name", "Name")
+                      .replace("asc", "Ascending")
+                      .replace("desc", "Descending")}
+                  </span>
+                  <X className="w-4 h-4" />
+                </button>
               )}
             </div>
           </div>
@@ -352,10 +388,16 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Sort by:</SelectLabel>
-                <SelectItem value="name:asc">Name: A - Z</SelectItem>
-                <SelectItem value="name:desc">Name: Z - A</SelectItem>
-                <SelectItem value="publishedAt:asc">Published: Asc</SelectItem>
-                <SelectItem value="publishedAt:desc">
+                <SelectItem value="name:asc" className="cursor-pointer">
+                  Name: A - Z
+                </SelectItem>
+                <SelectItem value="name:desc" className="cursor-pointer">
+                  Name: Z - A
+                </SelectItem>
+                <SelectItem value="publishedAt:asc" className="cursor-pointer">
+                  Published: Asc
+                </SelectItem>
+                <SelectItem value="publishedAt:desc" className="cursor-pointer">
                   Published: Desc
                 </SelectItem>
               </SelectGroup>
@@ -374,7 +416,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
         />
         {recipeResultsTotal > PAGE_SIZE && (
           <Pagination className="justify-center">
-            <PaginationContent className="list-none">
+            <PaginationContent className="list-none flex gap-2">
               <PaginationItem>
                 <PaginationPrevious
                   href="#"

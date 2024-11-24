@@ -53,7 +53,7 @@ const PaginationLink = ({
     aria-disabled={disabled}
     className={cn(
       buttonVariants({
-        variant: isActive ? "outline" : "ghost",
+        variant: isActive ? "primary" : "tertiary",
         size,
       }),
       disabled && "opacity-50 cursor-not-allowed pointer-events-none",

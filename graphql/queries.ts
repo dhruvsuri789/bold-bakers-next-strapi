@@ -1,6 +1,7 @@
 import "server-only";
 import { strapiGQLQuery } from "./fetch";
 import {
+  AboutQuery,
   AuthorsQuery,
   CategoryCoursesAuthorsQuery,
   HomepageSectionsQuery,
@@ -444,4 +445,29 @@ export async function getRecipesCount() {
   }
 
   return data.recipes_connection.pageInfo.total;
+}
+
+export async function getAboutPage() {
+  const query = `#graphql
+    query AboutQuery {
+      about {
+        body
+        heading
+        highlight
+        image {
+          url
+        }
+      }
+    }
+  `;
+
+  const data = await strapiGQLQuery<AboutQuery>({
+    query,
+  });
+
+  if (!data) {
+    throw new Error("No data");
+  }
+
+  return data;
 }

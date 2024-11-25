@@ -5,6 +5,7 @@ import "./globals.css";
 import ReactQueryProvider from "./_components/ReactQueryProvider";
 import Container from "./_components/Container";
 import Nav from "./_components/Nav";
+import Footer from "./_components/Footer";
 
 const lora = Lora({
   subsets: ["latin"],
@@ -19,7 +20,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Bold Bakers",
+  title: "Bold Baking",
   description: "Welcome to the recipes of Bold Bakers and become one of them!",
 };
 
@@ -31,14 +32,17 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${lora.variable} ${inter.variable}`}>
       <body className="antialiased text-neutral-900 bg-red-50">
+        <div className="w-full h-2 bg-red-600"></div>
         <ReactQueryProvider>
           <NuqsAdapter>
             <Container>
               <Nav />
               {children}
+              <Footer />
             </Container>
           </NuqsAdapter>
         </ReactQueryProvider>
+        <div className="w-full h-2 bg-red-600"></div>
       </body>
     </html>
   );

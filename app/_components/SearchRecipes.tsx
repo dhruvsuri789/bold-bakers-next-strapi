@@ -187,7 +187,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
               Clear
             </button>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1">
             {categories.map((cat) => {
               return (
                 <div
@@ -206,7 +206,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
                       className="accent-red-600 w-4 h-4"
                     />
                   </div>
-                  <label htmlFor={cat.name} className="flex-1">
+                  <label htmlFor={cat.name} className="flex-1 pt-1">
                     {cat.name}
                   </label>
                 </div>
@@ -227,7 +227,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
               Clear
             </button>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1">
             {authors.map((auth) => {
               return (
                 <div
@@ -246,7 +246,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
                       className="accent-red-600 w-4 h-4"
                     />
                   </div>
-                  <label htmlFor={auth.name} className="flex-1">
+                  <label htmlFor={auth.name} className="flex-1 pt-1">
                     {auth.name}
                   </label>
                 </div>
@@ -267,7 +267,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
               Clear
             </button>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1">
             {courses.map((cour) => {
               return (
                 <div
@@ -286,7 +286,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
                       className="accent-red-600 w-4 h-4"
                     />
                   </div>
-                  <label htmlFor={cour.name} className="flex-1">
+                  <label htmlFor={cour.name} className="flex-1 pt-1">
                     {cour.name}
                   </label>
                 </div>

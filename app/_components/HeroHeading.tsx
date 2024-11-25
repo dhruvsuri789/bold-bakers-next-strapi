@@ -7,14 +7,9 @@ function HeroHeading() {
         Find the best recipes and become a{" "}
         <span className="text-red-600">bolder baker</span>
       </h1>
-      <div className="flex gap-4">
-        <ButtonLink href="/recipes" varient="primary">
-          Explore recipes
-        </ButtonLink>
-        <ButtonLink varient="secondary" href="#">
-          Continue reading
-        </ButtonLink>
-      </div>
+      <ButtonLink href="/recipes" varient="primary">
+        Explore recipes
+      </ButtonLink>
     </div>
   );
 }

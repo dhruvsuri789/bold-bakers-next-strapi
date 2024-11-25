@@ -168,3 +168,14 @@ export type RecipesCountQuery = {
     };
   };
 };
+
+export type AboutQuery = {
+  about: {
+    body: string;
+    heading: string;
+    highlight: string;
+    image: {
+      url: string;
+    };
+  };
+};

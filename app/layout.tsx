@@ -3,6 +3,8 @@ import { Inter, Lora } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import "./globals.css";
 import ReactQueryProvider from "./_components/ReactQueryProvider";
+import Container from "./_components/Container";
+import Nav from "./_components/Nav";
 
 const lora = Lora({
   subsets: ["latin"],
@@ -30,7 +32,12 @@ export default function RootLayout({
     <html lang="en" className={`${lora.variable} ${inter.variable}`}>
       <body className="antialiased text-neutral-900 bg-red-50">
         <ReactQueryProvider>
-          <NuqsAdapter>{children}</NuqsAdapter>
+          <NuqsAdapter>
+            <Container>
+              <Nav />
+              {children}
+            </Container>
+          </NuqsAdapter>
         </ReactQueryProvider>
       </body>
     </html>

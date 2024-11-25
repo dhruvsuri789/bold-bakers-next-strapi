@@ -62,134 +62,129 @@ async function RecipePage({ params }: RecipePageProps) {
   ];
 
   return (
-    <Container>
-      <Nav />
-      <main>
-        <div className="flex flex-col gap-4 py-8">
-          <div className="text-red-600 text-sm font-bold flex gap-4">
-            {categories.map((category, index) => (
-              <span className="flex gap-4" key={`${category.name}-${index}`}>
-                <Link
-                  href={`/recipes?category=${encodeURIComponent(
-                    category.name
-                  )}`}
-                  className="hover:text-red-500 transition-colors"
-                >
-                  {category.name}
-                </Link>
-                {index < categoriesLength - 1 && <span>•</span>}
-              </span>
-            ))}
-          </div>
-          <div className="grid grid-cols-[2fr,auto]">
-            <div className="max-w-[600px] flex flex-col gap-4">
-              <h1 className="text-4xl font-bold">{name}</h1>
-              <p>{description}</p>
-              <span className="text-sm text-neutral-600">
-                By{" "}
-                {
-                  <Link
-                    className="font-semibold text-red-600 hover:text-red-500 transition-colors"
-                    href={`/recipes?author=${encodeURIComponent(author.name)}`}
-                  >
-                    {author.name}
-                  </Link>
-                }{" "}
-                |{"  Published on "}
-                {new Date(publishedAt).toLocaleString("en-US", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}{" "}
-                |{" Updated on "}
-                {new Date(updatedAt).toLocaleString("en-US", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
-              </span>
-            </div>
-            <div className="grid grid-cols-2 gap-4 self-end">
-              <ButtonLink varient="secondary" href="#ingredients">
-                Jump to recipe
-              </ButtonLink>
-              <ButtonLink varient="primary" href="#video">
-                Jump to video
-              </ButtonLink>
-            </div>
-          </div>
-          <div className="aspect-video relative rounded-3xl overflow-hidden mt-4">
-            <Image
-              fill
-              className="object-cover"
-              src={`${BASE_URL}${image.url}`}
-              alt={name}
-            />
-          </div>
-          <div className="grid grid-cols-[2.5fr,1fr] gap-8 mt-4">
-            <div className="flex flex-col gap-12">
-              <div className="flex flex-col gap-4">
-                <h2 className="text-3xl font-bold" id="stats">
-                  Stats
-                </h2>
-                <div className="flex gap-4 divide-x-2">
-                  {stats.map((stat, index) => {
-                    if (!stat.value) return null; // Skip if value is not present
-
-                    const paddingClass = index === 0 ? "pr-4" : "pl-7 pr-4";
-
-                    return (
-                      <div key={stat.label} className={paddingClass}>
-                        {StatsInfo(stat.label, stat.value, stat.unit)}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              {videoId && (
-                <div className="flex flex-col gap-4 ">
-                  <h2 className="text-3xl font-bold" id="video">
-                    Video
-                  </h2>
-                  <iframe
-                    src={`https://www.youtube.com/embed/${videoId}`} // Ensure videoId is the correct YouTube video ID
-                    title={name}
-                    className="aspect-video rounded-3xl"
-                    allowFullScreen
-                  />
-                </div>
-              )}
-              <div className="flex flex-col gap-4">
-                <h2 className="text-3xl font-bold" id="ingredients">
-                  Ingredients
-                </h2>
-                <Markdown remarkPlugins={[remarkGfm]}>{ingredients}</Markdown>
-              </div>
-              <div className="flex flex-col gap-4">
-                <h2 className="text-3xl font-bold" id="instructions">
-                  Instructions
-                </h2>
-                <Markdown remarkPlugins={[remarkGfm]}>{instructions}</Markdown>
-              </div>
-              {recipeNotes && (
-                <div className="flex flex-col gap-4">
-                  <h2 className="text-3xl font-bold" id="recipeNotes">
-                    Recipe Notes
-                  </h2>
-                  <Markdown remarkPlugins={[remarkGfm]}>{recipeNotes}</Markdown>
-                </div>
-              )}
-            </div>
-          </div>
-          <Suspense fallback="...Loading">
-            <RelatedRecipes categories={categories} recipeID={documentId} />
-          </Suspense>
-          <Suspense fallback="...Loading">
-            <AboutSmallAndFeatured />
-          </Suspense>
+    <main>
+      <div className="flex flex-col gap-4 py-8">
+        <div className="text-red-600 text-sm font-bold flex gap-4">
+          {categories.map((category, index) => (
+            <span className="flex gap-4" key={`${category.name}-${index}`}>
+              <Link
+                href={`/recipes?category=${encodeURIComponent(category.name)}`}
+                className="hover:text-red-500 transition-colors"
+              >
+                {category.name}
+              </Link>
+              {index < categoriesLength - 1 && <span>•</span>}
+            </span>
+          ))}
         </div>
-      </main>
-    </Container>
+        <div className="grid grid-cols-[2fr,auto]">
+          <div className="max-w-[600px] flex flex-col gap-4">
+            <h1 className="text-4xl font-bold">{name}</h1>
+            <p>{description}</p>
+            <span className="text-sm text-neutral-600">
+              By{" "}
+              {
+                <Link
+                  className="font-semibold text-red-600 hover:text-red-500 transition-colors"
+                  href={`/recipes?author=${encodeURIComponent(author.name)}`}
+                >
+                  {author.name}
+                </Link>
+              }{" "}
+              |{"  Published on "}
+              {new Date(publishedAt).toLocaleString("en-US", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}{" "}
+              |{" Updated on "}
+              {new Date(updatedAt).toLocaleString("en-US", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-4 self-end">
+            <ButtonLink varient="secondary" href="#ingredients">
+              Jump to recipe
+            </ButtonLink>
+            <ButtonLink varient="primary" href="#video">
+              Jump to video
+            </ButtonLink>
+          </div>
+        </div>
+        <div className="aspect-video relative rounded-3xl overflow-hidden mt-4">
+          <Image
+            fill
+            className="object-cover"
+            src={`${BASE_URL}${image.url}`}
+            alt={name}
+          />
+        </div>
+        <div className="grid grid-cols-[2.5fr,1fr] gap-8 mt-4">
+          <div className="flex flex-col gap-12">
+            <div className="flex flex-col gap-4">
+              <h2 className="text-3xl font-bold" id="stats">
+                Stats
+              </h2>
+              <div className="flex gap-4 divide-x-2">
+                {stats.map((stat, index) => {
+                  if (!stat.value) return null; // Skip if value is not present
+
+                  const paddingClass = index === 0 ? "pr-4" : "pl-7 pr-4";
+
+                  return (
+                    <div key={stat.label} className={paddingClass}>
+                      {StatsInfo(stat.label, stat.value, stat.unit)}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            {videoId && (
+              <div className="flex flex-col gap-4 ">
+                <h2 className="text-3xl font-bold" id="video">
+                  Video
+                </h2>
+                <iframe
+                  src={`https://www.youtube.com/embed/${videoId}`} // Ensure videoId is the correct YouTube video ID
+                  title={name}
+                  className="aspect-video rounded-3xl"
+                  allowFullScreen
+                />
+              </div>
+            )}
+            <div className="flex flex-col gap-4">
+              <h2 className="text-3xl font-bold" id="ingredients">
+                Ingredients
+              </h2>
+              <Markdown remarkPlugins={[remarkGfm]}>{ingredients}</Markdown>
+            </div>
+            <div className="flex flex-col gap-4">
+              <h2 className="text-3xl font-bold" id="instructions">
+                Instructions
+              </h2>
+              <Markdown remarkPlugins={[remarkGfm]}>{instructions}</Markdown>
+            </div>
+            {recipeNotes && (
+              <div className="flex flex-col gap-4">
+                <h2 className="text-3xl font-bold" id="recipeNotes">
+                  Recipe Notes
+                </h2>
+                <Markdown remarkPlugins={[remarkGfm]}>{recipeNotes}</Markdown>
+              </div>
+            )}
+          </div>
+        </div>
+        <Suspense fallback="...Loading">
+          <RelatedRecipes categories={categories} recipeID={documentId} />
+        </Suspense>
+        <Suspense fallback="...Loading">
+          <AboutSmallAndFeatured />
+        </Suspense>
+      </div>
+    </main>
   );
 }
 

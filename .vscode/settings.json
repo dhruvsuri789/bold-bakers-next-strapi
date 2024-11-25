@@ -5,5 +5,8 @@
   "css.format.spaceAroundSelectorSeparator": true,
   "editor.tabSize": 2,
   "editor.wordWrap": "on",
-  "editor.bracketPairColorization.enabled": true
+  "editor.bracketPairColorization.enabled": true,
+  "editor.quickSuggestions": {
+    "strings": "on"
+  }
 }

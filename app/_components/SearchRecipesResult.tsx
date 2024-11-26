@@ -39,7 +39,7 @@ function SearchRecipesResult({
       }).then((res) => res.json());
       return data as RecipeSearchQuery;
     },
-    gcTime: 5000,
+    gcTime: 10000,
   });
 
   function handleReset() {

@@ -161,6 +161,12 @@ export type RecipeSearchQuery = {
   };
 };
 
+export type RecipesIdsQuery = {
+  recipes: {
+    documentId: string;
+  }[];
+};
+
 export type RecipesCountQuery = {
   recipes_connection: {
     pageInfo: {

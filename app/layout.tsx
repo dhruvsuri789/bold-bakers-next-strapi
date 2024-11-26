@@ -20,7 +20,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Bold Baking",
+  title: "Bolder Baking",
   description: "Welcome to the recipes of Bold Bakers and become one of them!",
 };
 

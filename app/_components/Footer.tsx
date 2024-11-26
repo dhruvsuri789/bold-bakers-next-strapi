@@ -42,7 +42,7 @@ const categories = [
 
 function Footer() {
   return (
-    <footer className="grid grid-cols-[1fr,1fr,2fr,1fr] mt-8 gap-2 py-12">
+    <footer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr,1fr,2fr,1fr] mt-8 gap-12 md:gap-8 py-12">
       <div>
         <Link href="/">
           <Image

@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import AboutSmallAndFeatured from "@/app/_components/AboutSmallAndFeatured";
 import ButtonLink from "@/app/_components/ButtonLink";
-import Container from "@/app/_components/Container";
-import Nav from "@/app/_components/Nav";
 import RelatedRecipes from "@/app/_components/RelatedRecipes";
-import { getRecipe } from "@/graphql/queries";
+import { getRecipe, getRecipesIds } from "@/graphql/queries";
 import { BASE_URL } from "@/utils/constants";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,7 +16,12 @@ interface RecipePageProps {
   };
 }
 
-//TODO Generate static params
+export async function generateStaticParams() {
+  const { recipes } = await getRecipesIds();
+  return recipes.map((recipe) => ({
+    id: recipe.documentId,
+  }));
+}
 
 async function RecipePage({ params }: RecipePageProps) {
   const { recipes } = await getRecipe(params.id);
@@ -77,7 +80,7 @@ async function RecipePage({ params }: RecipePageProps) {
             </span>
           ))}
         </div>
-        <div className="grid grid-cols-[2fr,auto]">
+        <div className="grid lg:grid-cols-[2fr,auto] grid-cols-1 gap-8 justify-items-start">
           <div className="max-w-[600px] flex flex-col gap-4">
             <h1 className="text-4xl font-bold">{name}</h1>
             <p>{description}</p>
@@ -122,13 +125,13 @@ async function RecipePage({ params }: RecipePageProps) {
             alt={name}
           />
         </div>
-        <div className="grid grid-cols-[2.5fr,1fr] gap-8 mt-4">
+        <div className="grid lg:grid-cols-[2.5fr,1fr] grid-cols-1 gap-8 mt-4">
           <div className="flex flex-col gap-12">
             <div className="flex flex-col gap-4">
               <h2 className="text-3xl font-bold" id="stats">
                 Stats
               </h2>
-              <div className="flex gap-4 divide-x-2">
+              <div className="flex flex-wrap gap-4 gap-y-8 divide-x-2">
                 {stats.map((stat, index) => {
                   if (!stat.value) return null; // Skip if value is not present
 

@@ -7,6 +7,7 @@ import {
   HomepageSectionsQuery,
   RecipesCountQuery,
   RecipeSearchQuery,
+  RecipesIdsQuery,
   RecipesQuery,
   RelatedRecipesQuery,
 } from "./types";
@@ -408,6 +409,26 @@ export async function getSearchRecipes({
     },
     revalidate: 0,
     tags: ["recipesData"],
+  });
+
+  if (!data) {
+    throw new Error("No data");
+  }
+
+  return data;
+}
+
+export async function getRecipesIds() {
+  const query = `#graphql
+    query RecipesIds {
+      recipes {
+        documentId
+      }
+    }
+  `;
+
+  const data = await strapiGQLQuery<RecipesIdsQuery>({
+    query,
   });
 
   if (!data) {

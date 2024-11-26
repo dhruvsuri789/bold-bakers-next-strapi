@@ -25,9 +25,15 @@ import {
   PaginationPrevious,
 } from "@/app/_components/ui/pagination";
 
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/app/_components/ui/popover";
+
 import { PAGE_SIZE } from "@/utils/constants";
-import { X } from "lucide-react";
-import { useState } from "react";
+import { SlidersHorizontal, X } from "lucide-react";
+import { forwardRef, useCallback, useEffect, useState } from "react";
 
 /* 
 {
@@ -45,14 +51,12 @@ to ->
 
 const debounceSearch = debounce(
   async (searchText: string, setter: (name: string) => void) => {
-    console.log(searchText);
     if (!searchText || searchText.length < 3) {
-      setter("");
       return;
     }
     setter(searchText);
   },
-  500
+  700
 );
 
 interface SearchRecipesProps {
@@ -61,7 +65,7 @@ interface SearchRecipesProps {
 
 function SearchRecipes({ filters }: SearchRecipesProps) {
   const { authors, categories, courses } = filters;
-  const [inputValue, setInputValue] = useState("");
+  // const [inputValue, setInputValue] = useState("");
   const [recipeResults, setRecipeResults] = useState(0);
   const [recipeResultsTotal, setRecipeResultsTotal] = useState(0);
   const [page, setPage] = useQueryState("page", parseAsString.withDefault(""));
@@ -134,29 +138,40 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
     setAuthor([]);
     setCourse([]);
     setSortBy(null);
-    setInputValue("");
+    // setInputValue("");
     setName("");
     setPage("");
   }
 
-  return (
-    <div className="grid grid-cols-[300px,1fr] gap-8 items-start">
-      <div className="border-slate-200 border rounded-xl grid grid-template-rows-[auto,1fr] gap-4 p-6 divide-y-2 h-[800px] overflow-y-scroll bg-neutral-50">
+  function Filters() {
+    const [searchValue, setSearchValue] = useState(name || "");
+
+    // Keep searchValue in sync with name
+    useEffect(() => {
+      setSearchValue(name || "");
+    }, [name]);
+
+    const handleSearch = useCallback(
+      (value: string) => {
+        if (page && parseInt(page) > 1) {
+          handlePageChange(1);
+        }
+        setSearchValue(value);
+        debounceSearch(value, setName);
+      },
+      [page]
+    );
+
+    return (
+      <div className="border-slate-200 border rounded-xl grid grid-template-rows-[auto,1fr] gap-4 p-6 divide-y-2 h-[800px] overflow-y-scroll bg-neutral-50 w-full">
         <div className="flex flex-col gap-2">
           <span className="font-bold text-xl">Search</span>
           <Input
             type="search"
             placeholder="Search recipes (min. 3 char)"
             className="w-full h-12 rounded-lg"
-            value={inputValue || ""}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (page && parseInt(page) > 1) {
-                handlePageChange(1);
-              }
-              setInputValue(value);
-              debounceSearch(value, setName);
-            }}
+            value={searchValue}
+            onChange={(e) => handleSearch(e.target.value)}
           />
         </div>
         <div className="grid grid-cols-[1fr,auto] gap-2 pt-4">
@@ -295,72 +310,86 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
           </div>
         </div>
       </div>
-      <div className="grid grid-rows-[auto,1fr,auto] gap-6 mb-12">
-        <div className="grid grid-cols-[1fr,auto] gap-6 p-4 border border-slate-200 rounded-xl bg-neutral-50">
-          <div className="grid grid-cols-[auto,1fr] items-center">
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-[300px,1fr] gap-8 items-start">
+      <div className="hidden lg:block">
+        <Filters />
+      </div>
+      <div className="flex flex-col gap-12 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr,auto] gap-6 p-4 border border-slate-200 rounded-xl bg-neutral-50">
+          <div className="grid grid-rows-1 gap-y-2 gap-x-2 lg:gap-y-0 lg:grid-cols-[auto,1fr] items-center ">
             <span className="text-sm text-neutral-600">Filtered by:</span>
             <div className="flex gap-2 items-center flex-wrap">
               {name && (
                 <button
-                  className="font-semibold ml-2 bg-violet-600 px-4 py-2 text-neutral-50 rounded-full hover:bg-violet-500 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-2"
+                  className="font-semibold bg-violet-600 px-6 py-2 text-neutral-50 rounded-full hover:bg-violet-500 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-4"
                   onClick={() => {
                     setName("");
                     setPage("");
-                    setInputValue("");
+                    // setInputValue("");
                   }}
                 >
-                  <span>Name: {name}</span>
-                  <X className="w-4 h-4" />
+                  <span className="text-left">Name: {name}</span>
+                  <X className="w-4 h-4" strokeWidth={3} />
                 </button>
               )}
               {category && category.length > 0 && (
                 <button
-                  className="font-semibold ml-2 bg-red-500 px-4 py-2 text-neutral-50 rounded-full hover:bg-red-400 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-2"
+                  className="font-semibold bg-red-500 px-6 py-2 text-neutral-50 rounded-full hover:bg-red-400 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-4"
                   onClick={() => {
                     setCategory([]);
                     setPage("");
                   }}
                 >
-                  <span>Categories: {category.join(", ")}</span>
-                  <X className="w-4 h-4" />
+                  <span className="text-left">
+                    Categories: {category.join(", ")}
+                  </span>
+                  <X className="w-4 h-4" strokeWidth={3} />
                 </button>
               )}
 
               {author && author.length > 0 && (
                 <button
-                  className="font-semibold ml-2 bg-green-700 px-4 py-2 text-neutral-50 rounded-full hover:bg-green-600 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-2"
+                  className="font-semibold  bg-green-700 px-6 py-2 text-neutral-50 rounded-full hover:bg-green-600 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-4"
                   onClick={() => {
                     setAuthor([]);
                     setPage("");
                   }}
                 >
-                  <span>Authors: {author.join(", ")}</span>
-                  <X className="w-4 h-4" />
+                  <span className="text-left">
+                    Authors: {author.join(", ")}
+                  </span>
+                  <X className="w-4 h-4" strokeWidth={3} />
                 </button>
               )}
 
               {course && course.length > 0 && (
                 <button
-                  className="font-semibold ml-2 bg-blue-700 px-4 py-2 text-neutral-50 rounded-full hover:bg-blue-600 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-2"
+                  className="font-semibold bg-blue-700 px-6 py-2 text-neutral-50 rounded-full hover:bg-blue-600 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-4"
                   onClick={() => {
                     setCourse([]);
                     setPage("");
                   }}
                 >
-                  <span>Courses: {course.join(", ")}</span>
-                  <X className="w-4 h-4" />
+                  <span className="text-left">
+                    Courses: {course.join(", ")}
+                  </span>
+                  <X className="w-4 h-4" strokeWidth={3} />
                 </button>
               )}
 
               {sortBy && (
                 <button
-                  className="font-semibold ml-2 bg-yellow-600 px-4 py-2 text-neutral-50 rounded-full hover:bg-yellow-500 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-2"
+                  className="font-semibold bg-yellow-600 px-6 py-2 text-neutral-50 rounded-full hover:bg-yellow-500 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-4"
                   onClick={() => {
                     setSortBy("");
                     setPage("");
                   }}
                 >
-                  <span>
+                  <span className="text-left">
                     Sort by:{" "}
                     {sortBy
                       .split(":")
@@ -370,39 +399,64 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
                       .replace("asc", "Ascending")
                       .replace("desc", "Descending")}
                   </span>
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4" strokeWidth={3} />
                 </button>
               )}
             </div>
           </div>
-          <Select
-            onValueChange={(value) => {
-              setPage("1");
-              setSortBy(value);
-            }}
-            value={sortBy || ""}
-          >
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Sort" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Sort by:</SelectLabel>
-                <SelectItem value="name:asc" className="cursor-pointer">
-                  Name: A - Z
-                </SelectItem>
-                <SelectItem value="name:desc" className="cursor-pointer">
-                  Name: Z - A
-                </SelectItem>
-                <SelectItem value="publishedAt:asc" className="cursor-pointer">
-                  Published: Asc
-                </SelectItem>
-                <SelectItem value="publishedAt:desc" className="cursor-pointer">
-                  Published: Desc
-                </SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <div className="flex gap-4">
+            <Popover>
+              <PopoverTrigger className="lg:hidden w-[150px]" asChild>
+                <button className="flex items-center justify-between gap-4 py-[7px] px-3 border border-slate-200 rounded-md">
+                  <span className="text-sm">Filters</span>
+                  <SlidersHorizontal className="w-4 h-4 text-neutral-500" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                side="bottom"
+                align="start"
+                sideOffset={6}
+                avoidCollisions={false}
+                className="w-full"
+              >
+                <Filters />
+              </PopoverContent>
+            </Popover>
+            <Select
+              onValueChange={(value) => {
+                setPage("1");
+                setSortBy(value);
+              }}
+              value={sortBy || ""}
+            >
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Sort" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Sort by:</SelectLabel>
+                  <SelectItem value="name:asc" className="cursor-pointer">
+                    Name: A - Z
+                  </SelectItem>
+                  <SelectItem value="name:desc" className="cursor-pointer">
+                    Name: Z - A
+                  </SelectItem>
+                  <SelectItem
+                    value="publishedAt:asc"
+                    className="cursor-pointer"
+                  >
+                    Published: Asc
+                  </SelectItem>
+                  <SelectItem
+                    value="publishedAt:desc"
+                    className="cursor-pointer"
+                  >
+                    Published: Desc
+                  </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <SearchRecipesResult
           category={category}

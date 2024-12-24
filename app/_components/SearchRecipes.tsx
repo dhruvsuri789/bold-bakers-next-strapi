@@ -33,7 +33,7 @@ import {
 
 import { PAGE_SIZE } from "@/utils/constants";
 import { SlidersHorizontal, X } from "lucide-react";
-import { forwardRef, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 /* 
 {
@@ -149,18 +149,15 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
     // Keep searchValue in sync with name
     useEffect(() => {
       setSearchValue(name || "");
-    }, [name]);
+    }, []);
 
-    const handleSearch = useCallback(
-      (value: string) => {
-        if (page && parseInt(page) > 1) {
-          handlePageChange(1);
-        }
-        setSearchValue(value);
-        debounceSearch(value, setName);
-      },
-      [page]
-    );
+    const handleSearch = useCallback((value: string) => {
+      if (page && parseInt(page) > 1) {
+        handlePageChange(1);
+      }
+      setSearchValue(value);
+      debounceSearch(value, setName);
+    }, []);
 
     return (
       <div className="border-slate-200 border rounded-xl grid grid-template-rows-[auto,1fr] gap-4 p-6 divide-y-2 h-[800px] overflow-y-scroll bg-neutral-50 w-full">

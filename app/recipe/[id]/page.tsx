@@ -6,6 +6,7 @@ import { getRecipe, getRecipesIds } from "@/graphql/queries";
 // import { BASE_URL } from "@/utils/constants";
 import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -18,6 +19,11 @@ interface RecipePageProps {
 
 export async function generateStaticParams() {
   const { recipes } = await getRecipesIds();
+
+  if (recipes.length === 0) {
+    return [];
+  }
+
   return recipes.map((recipe) => ({
     id: recipe.documentId,
   }));
@@ -25,6 +31,11 @@ export async function generateStaticParams() {
 
 async function RecipePage({ params }: RecipePageProps) {
   const { recipes } = await getRecipe(params.id);
+
+  if (recipes.length === 0) {
+    return notFound();
+  }
+
   const {
     documentId,
     name,

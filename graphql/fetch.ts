@@ -1,5 +1,5 @@
-import { GQL_URL } from "@/utils/constants";
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 interface StrapiGQLQueryProps {
   query: string;
   variables?: any;
@@ -15,7 +15,7 @@ export async function strapiGQLQuery<T>({
   preview = false,
   revalidate,
 }: StrapiGQLQueryProps): Promise<T | undefined> {
-  const res = await fetch(`${GQL_URL}`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/graphql`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

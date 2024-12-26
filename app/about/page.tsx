@@ -1,5 +1,5 @@
 import { getAboutPage } from "@/graphql/queries";
-import { BASE_URL } from "@/utils/constants";
+// import { BASE_URL } from "@/utils/constants";
 import Image from "next/image";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -19,7 +19,7 @@ async function AboutPage() {
         <Image
           fill
           className="object-cover"
-          src={`${BASE_URL}${image.url}`}
+          src={`${process.env.NEXT_PUBLIC_STRAPI_API_URL}${image.url}`}
           alt={heading}
         />
       </div>

@@ -1,4 +1,4 @@
-import { BASE_URL } from "@/utils/constants";
+// import { BASE_URL } from "@/utils/constants";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -21,7 +21,7 @@ function RecipeItem({ recipe }: { recipe: Recipe }) {
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 25vw"
           className="object-cover group-hover:scale-105 transition-transform"
-          src={`${BASE_URL}${recipe.image.url}`}
+          src={`${process.env.NEXT_PUBLIC_STRAPI_API_URL}${recipe.image.url}`}
           alt={recipe.name}
           priority={true}
         />

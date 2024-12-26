@@ -3,7 +3,7 @@ import AboutSmallAndFeatured from "@/app/_components/AboutSmallAndFeatured";
 import ButtonLink from "@/app/_components/ButtonLink";
 import RelatedRecipes from "@/app/_components/RelatedRecipes";
 import { getRecipe, getRecipesIds } from "@/graphql/queries";
-import { BASE_URL } from "@/utils/constants";
+// import { BASE_URL } from "@/utils/constants";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -121,7 +121,7 @@ async function RecipePage({ params }: RecipePageProps) {
           <Image
             fill
             className="object-cover"
-            src={`${BASE_URL}${image.url}`}
+            src={`${process.env.NEXT_PUBLIC_STRAPI_API_URL}${image.url}`}
             alt={name}
           />
         </div>

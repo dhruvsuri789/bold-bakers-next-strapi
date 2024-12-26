@@ -5,7 +5,7 @@ import {
 } from "@strapi/blocks-react-renderer";
 import ButtonLink from "./ButtonLink";
 import Image from "next/image";
-import { BASE_URL } from "@/utils/constants";
+// import { BASE_URL } from "@/utils/constants";
 
 interface HomepageAboutSmallProps {
   section: HomepageAboutSmallQuery;
@@ -32,7 +32,7 @@ function HomepageAboutSmall({ section }: HomepageAboutSmallProps) {
           <Image
             fill
             className="object-cover"
-            src={`${BASE_URL}${url}`}
+            src={`${process.env.NEXT_PUBLIC_STRAPI_API_URL}${url}`}
             alt={name}
             sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 25vw"
           />

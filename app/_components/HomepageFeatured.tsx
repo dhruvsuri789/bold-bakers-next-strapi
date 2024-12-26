@@ -1,5 +1,5 @@
 import { HomepageFeaturedQuery } from "@/graphql/types";
-import { BASE_URL } from "@/utils/constants";
+// import { BASE_URL } from "@/utils/constants";
 import Image from "next/image";
 
 interface HomepageFeaturedProps {
@@ -16,7 +16,7 @@ function HomepageFeatured({ section }: HomepageFeaturedProps) {
         {logoImages.map((image) => {
           return (
             <Image
-              src={`${BASE_URL}${image.url}`}
+              src={`${process.env.NEXT_PUBLIC_STRAPI_API_URL}${image.url}`}
               alt={image.name}
               key={image.name}
               width={160}

@@ -2,7 +2,7 @@
 
 import { RecipeSearchQuery } from "@/graphql/types";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import RecipeItem from "./RecipeItem";
 import { Skeleton } from "./ui/skeleton";
 import { PAGE_SIZE } from "@/utils/constants";
@@ -42,10 +42,13 @@ function SearchRecipesResult({
     gcTime: 10000,
   });
 
-  function handleReset() {
-    setRecipeResults(0);
-    setRecipeResultsTotal(0);
-  }
+  const handleReset = useCallback(
+    function handleReset() {
+      setRecipeResults(0);
+      setRecipeResultsTotal(0);
+    },
+    [setRecipeResults, setRecipeResultsTotal]
+  );
 
   useEffect(() => {
     if (data?.recipes_connection.nodes.length) {

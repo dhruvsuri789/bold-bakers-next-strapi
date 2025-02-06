@@ -169,6 +169,8 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
             className="w-full h-12 rounded-lg"
             value={searchValue}
             onChange={(e) => handleSearch(e.target.value)}
+            id="search"
+            name="search"
           />
         </div>
         <div className="grid grid-cols-[1fr,auto] gap-2 pt-4">
@@ -203,13 +205,14 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
             {categories.map((cat) => {
               return (
                 <div
-                  key={cat.name}
+                  key={cat.documentId}
                   className="flex items-center gap-2 min-h-[24px]"
                 >
                   <div className="w-4 h-4 flex-shrink-0">
                     <input
                       type="checkbox"
-                      id={cat.name}
+                      id={cat.documentId}
+                      name={cat.documentId}
                       checked={category?.includes(cat.name)}
                       onChange={() => {
                         setPage("1");
@@ -218,7 +221,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
                       className="accent-red-600 w-4 h-4"
                     />
                   </div>
-                  <label htmlFor={cat.name} className="flex-1 pt-1">
+                  <label htmlFor={cat.documentId} className="flex-1 pt-1">
                     {cat.name}
                   </label>
                 </div>
@@ -243,13 +246,14 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
             {authors.map((auth) => {
               return (
                 <div
-                  key={auth.name}
+                  key={auth.documentId}
                   className="flex items-center gap-2 min-h-[24px]"
                 >
                   <div className="w-4 h-4 flex-shrink-0">
                     <input
                       type="checkbox"
-                      id={auth.name}
+                      id={auth.documentId}
+                      name={auth.documentId}
                       checked={author?.includes(auth.name)}
                       onChange={() => {
                         setPage("1");
@@ -258,7 +262,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
                       className="accent-red-600 w-4 h-4"
                     />
                   </div>
-                  <label htmlFor={auth.name} className="flex-1 pt-1">
+                  <label htmlFor={auth.documentId} className="flex-1 pt-1">
                     {auth.name}
                   </label>
                 </div>
@@ -283,13 +287,14 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
             {courses.map((cour) => {
               return (
                 <div
-                  key={cour.name}
+                  key={cour.documentId}
                   className="flex items-center gap-2 min-h-[24px]"
                 >
                   <div className="w-4 h-4 flex-shrink-0">
                     <input
                       type="checkbox"
-                      id={cour.name}
+                      id={cour.documentId}
+                      name={cour.documentId}
                       checked={course?.includes(cour.name)}
                       onChange={() => {
                         setPage("1");
@@ -298,7 +303,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
                       className="accent-red-600 w-4 h-4"
                     />
                   </div>
-                  <label htmlFor={cour.name} className="flex-1 pt-1">
+                  <label htmlFor={cour.documentId} className="flex-1 pt-1">
                     {cour.name}
                   </label>
                 </div>

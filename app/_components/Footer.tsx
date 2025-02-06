@@ -105,13 +105,21 @@ function Footer() {
             type="text"
             placeholder="Enter your name"
             className="w-full rounded-lg px-4 py-2 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
+            name="name"
+            id="name"
           />
           <input
             type="email"
             placeholder="Enter your email"
             className="w-full rounded-lg px-4 py-2 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
+            name="email"
+            id="email"
           />
-          <button className="bg-red-600 text-white font-bold px-6 py-3 rounded-lg text-sm hover:bg-red-500 transition-colors scroll-smooth">
+          <button
+            id="subscribe"
+            name="subscribe"
+            className="bg-red-600 text-white font-bold px-6 py-3 rounded-lg text-sm hover:bg-red-500 transition-colors scroll-smooth"
+          >
             Subscribe
           </button>
         </div>

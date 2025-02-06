@@ -6,9 +6,9 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "http",
-        hostname: "localhost",
-        port: "1337",
+        protocol: "https",
+        hostname: "bold-bakers-strapi.99dev.in",
+        port: "",
         pathname: "/uploads/**",
       },
     ],

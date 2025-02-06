@@ -25,6 +25,10 @@ export async function strapiGQLQuery<T>({
     next: { tags, ...{ revalidate } },
   });
 
+  if (!res.ok) {
+    throw new Error(`HTTP error! Status: ${res.status}`);
+  }
+
   const { data, errors } = await res.json();
 
   if (errors) {

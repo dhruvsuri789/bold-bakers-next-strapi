@@ -11,6 +11,7 @@ function Nav() {
           width={150}
           height={100}
           style={{ width: "auto" }}
+          priority
         />
       </Link>
       <ul className="flex gap-12 list-none">

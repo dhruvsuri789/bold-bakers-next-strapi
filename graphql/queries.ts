@@ -85,6 +85,8 @@ export async function getHomepageSections() {
     }
   `;
 
+  // await new Promise((resolve) => setTimeout(resolve, 250000));
+
   const data = await strapiGQLQuery<HomepageSectionsQuery>({ query });
 
   if (!data) {

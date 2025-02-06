@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import AboutSmallAndFeatured from "@/app/_components/AboutSmallAndFeatured";
 import ButtonLink from "@/app/_components/ButtonLink";
+import RecipeImageComponent from "@/app/_components/RecipeImageComponent";
 import RelatedRecipes from "@/app/_components/RelatedRecipes";
 import { getRecipe, getRecipesIds } from "@/graphql/queries";
 // import { BASE_URL } from "@/utils/constants";
-import Image from "next/image";
+// import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -129,12 +130,15 @@ async function RecipePage({ params }: RecipePageProps) {
           </div>
         </div>
         <div className="aspect-video relative rounded-3xl overflow-hidden mt-4">
-          <Image
+          <RecipeImageComponent url={image.url} name={name} />
+          {/* <Image
             fill
             className="object-cover"
             src={`${process.env.NEXT_PUBLIC_STRAPI_API_URL}${image.url}`}
             alt={name}
-          />
+            placeholder="blur"
+            blurDataURL=""
+          /> */}
         </div>
         <div className="grid lg:grid-cols-[2.5fr,1fr] grid-cols-1 gap-8 mt-4">
           <div className="flex flex-col gap-12">
@@ -191,10 +195,10 @@ async function RecipePage({ params }: RecipePageProps) {
             )}
           </div>
         </div>
-        <Suspense fallback="...Loading">
+        <Suspense fallback={<RelatedRecipes.Skeleton />}>
           <RelatedRecipes categories={categories} recipeID={documentId} />
         </Suspense>
-        <Suspense fallback="...Loading">
+        <Suspense fallback={<AboutSmallAndFeatured.Skeleton />}>
           <AboutSmallAndFeatured />
         </Suspense>
       </div>

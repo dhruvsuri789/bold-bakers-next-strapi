@@ -1,7 +1,10 @@
 "use client";
 
 import { Input } from "@/app/_components/ui/input";
-import { CategoryCoursesAuthorsQuery } from "@/graphql/types";
+import {
+  CategoryCoursesAuthorsQuery,
+  RecipeSearchQuery,
+} from "@/graphql/types";
 import { debounce } from "lodash";
 import { parseAsArrayOf, parseAsString, useQueryState } from "nuqs";
 import SearchRecipesResult from "./SearchRecipesResult";
@@ -34,6 +37,7 @@ import {
 import { PAGE_SIZE } from "@/utils/constants";
 import { SlidersHorizontal, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 /* 
 {
@@ -66,8 +70,8 @@ interface SearchRecipesProps {
 function SearchRecipes({ filters }: SearchRecipesProps) {
   const { authors, categories, courses } = filters;
   // const [inputValue, setInputValue] = useState("");
-  const [recipeResults, setRecipeResults] = useState(0);
-  const [recipeResultsTotal, setRecipeResultsTotal] = useState(0);
+  // const [recipeResults, setRecipeResults] = useState(0);
+  // const [recipeResultsTotal, setRecipeResultsTotal] = useState(0);
   const [page, setPage] = useQueryState("page", parseAsString.withDefault(""));
   const currentPage = page ? parseInt(page) : 1;
 
@@ -96,6 +100,30 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
     parseAsString.withDefault("")
   );
   const [name, setName] = useQueryState("name", parseAsString.withDefault(""));
+
+  //Use Query
+  const { status, fetchStatus, error, data } = useQuery({
+    queryKey: ["recipesData", { author, category, course, sortBy, name, page }],
+    queryFn: async () => {
+      const { data } = await fetch("/api/recipes", {
+        method: "POST",
+        body: JSON.stringify({
+          author,
+          category,
+          course,
+          sortBy,
+          name,
+          page,
+        }),
+      }).then((res) => res.json());
+      return data as RecipeSearchQuery;
+    },
+    gcTime: 10000,
+  });
+
+  // Set total recipes and results
+  const recipeResults = data?.recipes_connection?.nodes.length;
+  const totalRecipes = data?.recipes_connection?.pageInfo.total;
 
   // Function to toggle categories
   const toggleCategory = (value: string) => {
@@ -176,9 +204,9 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
         <div className="grid grid-cols-[1fr,auto] gap-2 pt-4">
           <p className="max-w-40">
             Showing{" "}
-            <span className="font-bold text-red-600">{recipeResults}</span>{" "}
+            <span className="font-bold text-red-600">{recipeResults ?? 0}</span>{" "}
             results of{" "}
-            <span className="font-bold text-red-600">{recipeResultsTotal}</span>{" "}
+            <span className="font-bold text-red-600">{totalRecipes ?? 0}</span>{" "}
             total recipes
           </p>
           <button
@@ -315,152 +343,155 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
     );
   }
 
+  function FilteredByComponent() {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr,auto] gap-6 p-4 border border-slate-200 rounded-xl bg-neutral-50">
+        <div className="grid grid-rows-1 gap-y-2 gap-x-2 lg:gap-y-0 lg:grid-cols-[auto,1fr] items-center ">
+          <span className="text-sm text-neutral-600">Filtered by:</span>
+          <div className="flex gap-2 items-center flex-wrap">
+            {name && (
+              <button
+                className="font-semibold bg-violet-600 px-6 py-2 text-neutral-50 rounded-full hover:bg-violet-500 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-4"
+                onClick={() => {
+                  setName("");
+                  setPage("");
+                  // setInputValue("");
+                }}
+              >
+                <span className="text-left">Name: {name}</span>
+                <X className="w-4 h-4" strokeWidth={3} />
+              </button>
+            )}
+            {category && category.length > 0 && (
+              <button
+                className="font-semibold bg-red-500 px-6 py-2 text-neutral-50 rounded-full hover:bg-red-400 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-4"
+                onClick={() => {
+                  setCategory([]);
+                  setPage("");
+                }}
+              >
+                <span className="text-left">
+                  Categories: {category.join(", ")}
+                </span>
+                <X className="w-4 h-4" strokeWidth={3} />
+              </button>
+            )}
+
+            {author && author.length > 0 && (
+              <button
+                className="font-semibold  bg-green-700 px-6 py-2 text-neutral-50 rounded-full hover:bg-green-600 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-4"
+                onClick={() => {
+                  setAuthor([]);
+                  setPage("");
+                }}
+              >
+                <span className="text-left">Authors: {author.join(", ")}</span>
+                <X className="w-4 h-4" strokeWidth={3} />
+              </button>
+            )}
+
+            {course && course.length > 0 && (
+              <button
+                className="font-semibold bg-blue-700 px-6 py-2 text-neutral-50 rounded-full hover:bg-blue-600 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-4"
+                onClick={() => {
+                  setCourse([]);
+                  setPage("");
+                }}
+              >
+                <span className="text-left">Courses: {course.join(", ")}</span>
+                <X className="w-4 h-4" strokeWidth={3} />
+              </button>
+            )}
+
+            {sortBy && (
+              <button
+                className="font-semibold bg-yellow-600 px-6 py-2 text-neutral-50 rounded-full hover:bg-yellow-500 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-4"
+                onClick={() => {
+                  setSortBy("");
+                  setPage("");
+                }}
+              >
+                <span className="text-left">
+                  Sort by:{" "}
+                  {sortBy
+                    .split(":")
+                    .join(" ")
+                    .replace("publishedAt", "Published")
+                    .replace("name", "Name")
+                    .replace("asc", "Ascending")
+                    .replace("desc", "Descending")}
+                </span>
+                <X className="w-4 h-4" strokeWidth={3} />
+              </button>
+            )}
+          </div>
+        </div>
+        <div className="flex gap-4">
+          <Popover>
+            <PopoverTrigger className="lg:hidden w-[150px]" asChild>
+              <button className="flex items-center justify-between gap-4 py-[7px] px-3 border border-slate-200 rounded-md">
+                <span className="text-sm">Filters</span>
+                <SlidersHorizontal className="w-4 h-4 text-neutral-500" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              side="bottom"
+              align="start"
+              sideOffset={6}
+              avoidCollisions={false}
+              className="w-full"
+            >
+              <Filters />
+            </PopoverContent>
+          </Popover>
+          <Select
+            onValueChange={(value) => {
+              setPage("1");
+              setSortBy(value);
+            }}
+            value={sortBy || ""}
+          >
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Sort" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Sort by:</SelectLabel>
+                <SelectItem value="name:asc" className="cursor-pointer">
+                  Name: A - Z
+                </SelectItem>
+                <SelectItem value="name:desc" className="cursor-pointer">
+                  Name: Z - A
+                </SelectItem>
+                <SelectItem value="publishedAt:asc" className="cursor-pointer">
+                  Published: Asc
+                </SelectItem>
+                <SelectItem value="publishedAt:desc" className="cursor-pointer">
+                  Published: Desc
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[300px,1fr] gap-8 items-start">
       <div className="hidden lg:block">
         <Filters />
       </div>
       <div className="flex flex-col gap-12 mb-12">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr,auto] gap-6 p-4 border border-slate-200 rounded-xl bg-neutral-50">
-          <div className="grid grid-rows-1 gap-y-2 gap-x-2 lg:gap-y-0 lg:grid-cols-[auto,1fr] items-center ">
-            <span className="text-sm text-neutral-600">Filtered by:</span>
-            <div className="flex gap-2 items-center flex-wrap">
-              {name && (
-                <button
-                  className="font-semibold bg-violet-600 px-6 py-2 text-neutral-50 rounded-full hover:bg-violet-500 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-4"
-                  onClick={() => {
-                    setName("");
-                    setPage("");
-                    // setInputValue("");
-                  }}
-                >
-                  <span className="text-left">Name: {name}</span>
-                  <X className="w-4 h-4" strokeWidth={3} />
-                </button>
-              )}
-              {category && category.length > 0 && (
-                <button
-                  className="font-semibold bg-red-500 px-6 py-2 text-neutral-50 rounded-full hover:bg-red-400 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-4"
-                  onClick={() => {
-                    setCategory([]);
-                    setPage("");
-                  }}
-                >
-                  <span className="text-left">
-                    Categories: {category.join(", ")}
-                  </span>
-                  <X className="w-4 h-4" strokeWidth={3} />
-                </button>
-              )}
-
-              {author && author.length > 0 && (
-                <button
-                  className="font-semibold  bg-green-700 px-6 py-2 text-neutral-50 rounded-full hover:bg-green-600 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-4"
-                  onClick={() => {
-                    setAuthor([]);
-                    setPage("");
-                  }}
-                >
-                  <span className="text-left">
-                    Authors: {author.join(", ")}
-                  </span>
-                  <X className="w-4 h-4" strokeWidth={3} />
-                </button>
-              )}
-
-              {course && course.length > 0 && (
-                <button
-                  className="font-semibold bg-blue-700 px-6 py-2 text-neutral-50 rounded-full hover:bg-blue-600 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-4"
-                  onClick={() => {
-                    setCourse([]);
-                    setPage("");
-                  }}
-                >
-                  <span className="text-left">
-                    Courses: {course.join(", ")}
-                  </span>
-                  <X className="w-4 h-4" strokeWidth={3} />
-                </button>
-              )}
-
-              {sortBy && (
-                <button
-                  className="font-semibold bg-yellow-600 px-6 py-2 text-neutral-50 rounded-full hover:bg-yellow-500 transition-colors cursor-pointer grid grid-cols-[1fr,auto] items-center gap-4"
-                  onClick={() => {
-                    setSortBy("");
-                    setPage("");
-                  }}
-                >
-                  <span className="text-left">
-                    Sort by:{" "}
-                    {sortBy
-                      .split(":")
-                      .join(" ")
-                      .replace("publishedAt", "Published")
-                      .replace("name", "Name")
-                      .replace("asc", "Ascending")
-                      .replace("desc", "Descending")}
-                  </span>
-                  <X className="w-4 h-4" strokeWidth={3} />
-                </button>
-              )}
-            </div>
-          </div>
-          <div className="flex gap-4">
-            <Popover>
-              <PopoverTrigger className="lg:hidden w-[150px]" asChild>
-                <button className="flex items-center justify-between gap-4 py-[7px] px-3 border border-slate-200 rounded-md">
-                  <span className="text-sm">Filters</span>
-                  <SlidersHorizontal className="w-4 h-4 text-neutral-500" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent
-                side="bottom"
-                align="start"
-                sideOffset={6}
-                avoidCollisions={false}
-                className="w-full"
-              >
-                <Filters />
-              </PopoverContent>
-            </Popover>
-            <Select
-              onValueChange={(value) => {
-                setPage("1");
-                setSortBy(value);
-              }}
-              value={sortBy || ""}
-            >
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="Sort" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Sort by:</SelectLabel>
-                  <SelectItem value="name:asc" className="cursor-pointer">
-                    Name: A - Z
-                  </SelectItem>
-                  <SelectItem value="name:desc" className="cursor-pointer">
-                    Name: Z - A
-                  </SelectItem>
-                  <SelectItem
-                    value="publishedAt:asc"
-                    className="cursor-pointer"
-                  >
-                    Published: Asc
-                  </SelectItem>
-                  <SelectItem
-                    value="publishedAt:desc"
-                    className="cursor-pointer"
-                  >
-                    Published: Desc
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        <FilteredByComponent />
         <SearchRecipesResult
+          status={status}
+          fetchStatus={fetchStatus}
+          data={data}
+          error={error}
+        />
+
+        {/* <SearchRecipesResult
           category={category}
           author={author}
           course={course}
@@ -469,8 +500,8 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
           page={currentPage}
           setRecipeResults={setRecipeResults}
           setRecipeResultsTotal={setRecipeResultsTotal}
-        />
-        {recipeResultsTotal > PAGE_SIZE && (
+        /> */}
+        {totalRecipes && totalRecipes > PAGE_SIZE && (
           <Pagination className="justify-center">
             <PaginationContent className="list-none flex gap-2">
               <PaginationItem>
@@ -489,7 +520,7 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
               </PaginationItem>
 
               {(() => {
-                const totalPages = Math.ceil(recipeResultsTotal / PAGE_SIZE);
+                const totalPages = Math.ceil(totalRecipes / PAGE_SIZE);
                 const pages = [];
 
                 // Always show first page
@@ -566,17 +597,15 @@ function SearchRecipes({ filters }: SearchRecipesProps) {
                 <PaginationNext
                   href="#"
                   className={`border border-red-600 text-red-600 transition-colors ${
-                    currentPage < Math.ceil(recipeResultsTotal / PAGE_SIZE)
+                    currentPage < Math.ceil(totalRecipes / PAGE_SIZE)
                       ? "hover:bg-red-600 hover:text-neutral-50"
                       : "opacity-50 cursor-not-allowed"
                   }`}
                   onClick={() =>
-                    currentPage < Math.ceil(recipeResultsTotal / PAGE_SIZE) &&
+                    currentPage < Math.ceil(totalRecipes / PAGE_SIZE) &&
                     handlePageChange(currentPage + 1)
                   }
-                  disabled={
-                    currentPage >= Math.ceil(recipeResultsTotal / PAGE_SIZE)
-                  }
+                  disabled={currentPage >= Math.ceil(totalRecipes / PAGE_SIZE)}
                 />
               </PaginationItem>
             </PaginationContent>

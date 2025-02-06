@@ -1,8 +1,6 @@
 "use client";
 
 import { RecipeSearchQuery } from "@/graphql/types";
-import { useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect } from "react";
 import RecipeItem from "./RecipeItem";
 import { Skeleton } from "./ui/skeleton";
 import { PAGE_SIZE } from "@/utils/constants";
@@ -10,47 +8,19 @@ import { PAGE_SIZE } from "@/utils/constants";
 // These now can be set without null options
 // But I am leaving them in for now
 interface SearchRecipesResultProps {
-  category: string[];
-  author: string[];
-  course: string[];
-  sortBy: string;
-  name: string;
-  page: number;
-  setRecipeResults: (count: number) => void;
-  setRecipeResultsTotal: (count: number) => void;
+  status: string;
+  fetchStatus: string;
+  data: RecipeSearchQuery | undefined;
+  error: Error | null;
 }
 
 function SearchRecipesResult({
-  category,
-  author,
-  course,
-  sortBy,
-  name,
-  page,
-  setRecipeResults,
-  setRecipeResultsTotal,
+  status,
+  fetchStatus,
+  data,
+  error,
 }: SearchRecipesResultProps) {
-  const { status, fetchStatus, error, data } = useQuery({
-    queryKey: ["recipesData", { author, category, course, sortBy, name, page }],
-    queryFn: async () => {
-      const { data } = await fetch("/api/recipes", {
-        method: "POST",
-        body: JSON.stringify({ author, category, course, sortBy, name, page }),
-      }).then((res) => res.json());
-      return data as RecipeSearchQuery;
-    },
-    gcTime: 10000,
-  });
-
-  const handleReset = useCallback(
-    function handleReset() {
-      setRecipeResults(0);
-      setRecipeResultsTotal(0);
-    },
-    [setRecipeResults, setRecipeResultsTotal]
-  );
-
-  useEffect(() => {
+  /* useEffect(() => {
     if (data?.recipes_connection.nodes.length) {
       setRecipeResults(data.recipes_connection.nodes.length);
     }
@@ -60,7 +30,7 @@ function SearchRecipesResult({
     if (data?.recipes_connection.pageInfo.total) {
       setRecipeResultsTotal(data.recipes_connection.pageInfo.total);
     }
-  }, [data?.recipes_connection.pageInfo.total, setRecipeResultsTotal]);
+  }, [data?.recipes_connection.pageInfo.total, setRecipeResultsTotal]); */
 
   if (status === "pending") {
     if (fetchStatus === "fetching") {
@@ -68,9 +38,9 @@ function SearchRecipesResult({
     }
   }
 
-  // TODO Add Error page for recipes
+  // Add Error page for recipes
   if (error) {
-    handleReset();
+    // handleReset();
     console.error("Search error:", error);
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
@@ -84,9 +54,9 @@ function SearchRecipesResult({
     );
   }
 
-  // TODO Add Empty page for recipes
+  // Add Empty page for recipes
   if (!data || !data.recipes_connection.nodes.length) {
-    handleReset();
+    // handleReset();
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
         <p className="font-semibold text-xl">No recipes found</p>

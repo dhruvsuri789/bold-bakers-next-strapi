@@ -253,7 +253,7 @@ export async function getSearchRecipes({
               ? [
                   {
                     name: {
-                      contains: name,
+                      containsi: name,
                     },
                   },
                 ]
